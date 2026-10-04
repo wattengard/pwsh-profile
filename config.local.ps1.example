@@ -1,0 +1,14 @@
+# Local overrides for config.ps1.
+#
+# Copy this file to config.local.ps1 and keep only the lines you want to change. Git ignores
+# config.local.ps1, so pulling never touches it, and anything you leave out follows the defaults
+# in config.ps1 (which also lists every setting with its allowed values).
+#
+# Keep to one form, one setting per line:
+#     $env:NAME = 'value'
+# A trailing comment is fine. Tools that edit this file (the interactive config editor) read and
+# write exactly these lines and leave everything else, comments and other code, as it is.
+
+#$env:PROFILE_ICONS = 'plain'                # nerd (default) or plain
+#$env:PROMPT_GIT_MESSAGE_WIDTH = '100'       # characters of the commit subject
+#$env:PROMPT_GIT_STATE = '0'                 # 1 = show working tree state, 0 = hide it

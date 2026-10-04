@@ -1,5 +1,6 @@
 # Entry point for the personal PowerShell profile. Dot-sourced from $PROFILE.
-# Sources config.ps1, tools.ps1, then every profile.d\*.ps1 in name order (rc.d style).
+# Sources config.ps1 (which applies config.local.ps1 first, then the defaults), tools.ps1, then
+# every profile.d\*.ps1 in name order (rc.d style).
 
 foreach ($bootstrapFile in 'config.ps1', 'tools.ps1') {
     $bootstrapPath = Join-Path $PSScriptRoot $bootstrapFile

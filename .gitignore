@@ -1,1 +1,5 @@
 *.bak
+
+# Machine-local files: never committed, never touched by git pull
+config.local.ps1
+profile.d/*.local.ps1

@@ -15,7 +15,7 @@ A highly opinionated PowerShell 7 profile for Windows, rc.d style. See [README.m
 
 - `install.ps1` points `$PROFILE` at `bootstrap.ps1`. It backs up the old profile and overwrites it. Supports `-WhatIf`.
 - `bootstrap.ps1` dot-sources `config.ps1`, then `tools.ps1`, then every `profile.d\*.ps1` in name order. Keep it generic; put behavior in fragments.
-- `config.ps1` holds feature toggles as environment variables with defaults. A value the user set wins; a default it applied earlier is refreshed when the profile is reloaded (it tracks what it applied in `$global:ProfileConfigApplied`). Add new toggles there and document them in the README table. Name them `PROMPT_*` when they only affect the prompt and `PROFILE_*` when they cut across fragments (e.g. `PROFILE_ICONS`).
+- `config.ps1` is the tracked registry of settings (see "Configuration" below). It also loads the user's `config.local.ps1`. Never put a user's own values in `config.ps1`.
 - `tools.ps1` is the registry of optional external tools. It detects them into `$ProfileTools` (name -> path or `$null`).
 - `profile.d/NN_name.ps1` are the fragments. The numeric prefix controls load order.
 - `profile.d/80_audit.ps1` provides `Invoke-ProfileAudit` (`audit`), which reads the registry to report missing tools and install hints.
@@ -41,6 +41,18 @@ A highly opinionated PowerShell 7 profile for Windows, rc.d style. See [README.m
   - **The one exception, which proves the rule:** the git working tree state (staged, modified, untracked, conflicts, ahead/behind) cannot be read from files, so the prompt runs a single `git status --porcelain=v2 --branch` per prompt. It is held to strict limits: it is time-capped (`PROMPT_GIT_STATE_TIMEOUT_MS`, default 150 ms; a run that outlives the cap is left running and collected on the next prompt, so the prompt never blocks longer), cached per repo while the index and HEAD are unchanged and the result is under two seconds old, and can be switched off with `PROMPT_GIT_STATE=0`. Measured here: about 35 ms for small repos and under 70 ms at 60k files. Do not add any other process to the prompt path.
 - **Right-aligned commit subject.** It is positioned with a cursor-column escape, so only the subject is measured. It keeps the last column free so terminals do not wrap, leaves a 2-column gap from the left part, shrinks to fit, is left out when under 12 columns would fit, and falls back to inline when the terminal width cannot be read.
 - **Tab title.** Set on every prompt (programs like yazi leave their own behind): the prompt's path outside a repo, `repo (branch state)` inside one.
+
+## Configuration
+
+Settings are environment variables. `config.ps1` registers each one in `$global:ProfileConfigSpecs` (fields: `Name`, `Default`, `Type` of `bool`/`int`/`choice`, `Values` for choice, `Min` for int, `Group`, `Description`) and is the single source of truth for names, defaults and allowed values. The registry exists so tools can read it: the planned interactive config editor lists settings from it, validates against `Type`/`Values`/`Min`, and shows defaults. Keep specs accurate and keep the README config table in step with them.
+
+- **Naming.** `PROMPT_*` when a setting only affects the prompt, `PROFILE_*` when it cuts across fragments (e.g. `PROFILE_ICONS`).
+- **Local overrides.** A user's own values live in `config.local.ps1` (gitignored, so `git pull` never touches it; `config.local.ps1.example` is the tracked template). `config.ps1` dot-sources it before applying defaults. Machine-local fragments are `profile.d/*.local.ps1`, also gitignored.
+- **Precedence**, highest first: `config.local.ps1`, a value in the environment when the shell started, the default. A value typed into a running session wins until the profile is reloaded.
+- **Reload semantics.** `$global:ProfileConfigApplied` records every value `config.ps1` applied itself (defaults and values `config.local.ps1` set). On a reload those are cleared and recomputed, so a changed default or an edited or removed line takes effect, while a value typed into the session differs from the record and is left alone.
+- **Failure.** A `config.local.ps1` that throws or does not parse produces a warning; lines before the error still apply and the defaults fill the rest.
+- **The managed file format.** `config.local.ps1` is plain PowerShell, but a tool that edits it must treat only lines of the form `$env:NAME = 'value'` (single-quoted value, optional trailing `# comment`) as settings. It changes, adds or removes only those lines, for names in the registry, and leaves everything else (comments, blank lines, other code) untouched. To reset a setting it removes the line; it should also set the variable in the running session so the change applies without a reload.
+- **Adding a setting.** Add a spec to `config.ps1`, use `$env:NAME` in the fragment (with a safe fallback if the value is invalid), add a row to the README config table, and add it to `config.local.ps1.example` if it is commonly changed.
 
 ## Optional tools
 
@@ -78,7 +90,7 @@ Every feature (a single alias or a larger function) gets its own file `profile.d
 | `10-49` | Environment and shell behavior (PSReadLine, env vars, completions) | `10_psreadline.ps1` |
 | `50` | External tool integrations, one file per tool | `50_bat`, `50_eza`, `50_fzf`, `50_git`, `50_winget`, `50_yazi`, `50_zoxide` |
 | `80` | Personal functions with no external dependency | `80_audit.ps1` |
-| `90-99` | Late overrides, machine-local tweaks | |
+| `90-99` | Late overrides, machine-local tweaks (name machine-only ones `NN_name.local.ps1`, which git ignores) | |
 
 **File layout.** In this order:
 

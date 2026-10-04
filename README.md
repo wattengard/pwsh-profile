@@ -16,13 +16,27 @@ This backs up any existing `$PROFILE` to `$PROFILE.bak`, then overwrites it with
 | --- | --- |
 | `install.ps1` | Points `$PROFILE` at `bootstrap.ps1` |
 | `bootstrap.ps1` | Dot-sources `config.ps1`, `tools.ps1`, then every `profile.d\*.ps1` in name order |
-| `config.ps1` | Default environment variables that toggle features |
+| `config.ps1` | Every setting with its default, type and allowed values; also applies your local overrides |
+| `config.local.ps1` | Your own overrides. Not in the repo (git ignores it), so `git pull` never touches it. Copy `config.local.ps1.example` to start |
 | `tools.ps1` | Registry of optional external tools (e.g. `eza`); detects them and records their paths |
 | `profile.d/` | Profile fragments, loaded in order (`00_prompt.ps1`, ...) |
 
 ## Configuration
 
-`config.ps1` sets defaults as environment variables. A variable you set in the environment wins, so you can override per session (`$env:PROMPT_GIT_MESSAGE = '0'`). Reloading the profile (`. $PROFILE`) picks up changed defaults but never overwrites a value you set yourself.
+Settings are environment variables with defaults, defined in `config.ps1`. Do not edit that file to change your own settings, because pulling updates would overwrite them. Put overrides in `config.local.ps1` instead:
+
+```powershell
+Copy-Item config.local.ps1.example config.local.ps1
+```
+
+Keep only the lines you want, one per setting, in the form `$env:NAME = 'value'`:
+
+```powershell
+$env:PROFILE_ICONS = 'plain'
+$env:PROMPT_GIT_MESSAGE_WIDTH = '100'
+```
+
+`config.local.ps1` is applied on every load, so editing or removing a line and reloading the profile (`. $PROFILE`) takes effect, and a new default from a `git pull` reaches everything you have not overridden. Precedence, highest first: `config.local.ps1`, then a value in the environment when the shell started, then the default. A value typed into a running session (`$env:PROMPT_GIT_MESSAGE = '0'`) wins until you reload. A broken `config.local.ps1` produces a warning and the defaults still apply.
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
