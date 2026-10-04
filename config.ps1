@@ -4,8 +4,9 @@
 $defaults = [ordered]@{
     # Show the current commit's subject after the git branch in the prompt (1 = on, 0 = off).
     PROMPT_GIT_MESSAGE       = '1'
-    # Max characters of the commit subject to show; longer subjects are cut with an ellipsis.
-    PROMPT_GIT_MESSAGE_WIDTH = '40'
+    # Max characters of the commit subject to show (right-aligned on the first prompt line); longer
+    # subjects, or ones that would not fit next to the path and branch, are cut with an ellipsis.
+    PROMPT_GIT_MESSAGE_WIDTH = '72'
     # Show working tree state (staged, modified, untracked, conflicts, ahead/behind) after the
     # branch. Runs one time-capped git status per prompt (1 = on, 0 = off).
     PROMPT_GIT_STATE         = '1'

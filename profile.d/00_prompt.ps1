@@ -8,7 +8,7 @@
 #
 # Config (see config.ps1):
 #   PROMPT_GIT_MESSAGE            1/0  show the current commit subject
-#   PROMPT_GIT_MESSAGE_WIDTH      max characters of the subject
+#   PROMPT_GIT_MESSAGE_WIDTH      max characters of the subject (right-aligned; shrinks to fit)
 #   PROMPT_GIT_STATE              1/0  show working tree state
 #   PROMPT_GIT_STATE_TIMEOUT_MS   how long to wait for git status
 #   PROMPT_TAB_TITLE              1/0  set the terminal tab title (path, or "repo (branch state)")
@@ -307,6 +307,11 @@ function script:Format-GitState {
     $parts -join ' '
 }
 
+# Terminal width in columns, or 0 when it cannot be read (redirected or non-console host).
+function script:Get-PromptWidth {
+    try { [Math]::Max(0, $Host.UI.RawUI.WindowSize.Width) } catch { 0 }
+}
+
 function prompt {
     $succeeded = $?
 
@@ -315,6 +320,7 @@ function prompt {
 
     $grey = $PSStyle.Foreground.BrightBlack
     $git = ''
+    $right = ''
     $info = $null
     $summary = $null
     if ($PWD.Provider.Name -eq 'FileSystem') {
@@ -329,17 +335,33 @@ function prompt {
             }
 
             if ($info.Operation) { $text += " |$($info.Operation)" }
+            $git = " $text"
 
             if ($env:PROMPT_GIT_MESSAGE -eq '1') {
                 $subject = Get-GitCommitSubject $info $path
                 if ($subject) {
-                    $width = $env:PROMPT_GIT_MESSAGE_WIDTH -as [int]
-                    if (-not $width -or $width -lt 2) { $width = 40 }
-                    if ($subject.Length -gt $width) { $subject = $subject.Substring(0, $width - 1) + '…' }
-                    $text += " · $subject"
+                    $limit = $env:PROMPT_GIT_MESSAGE_WIDTH -as [int]
+                    if (-not $limit -or $limit -lt 2) { $limit = 72 }
+
+                    $columns = Get-PromptWidth
+                    if ($columns) {
+                        # Right-align: never overlap the left part (2 column gap), and keep the
+                        # last column free so the terminal does not wrap. If there is too little
+                        # room for a useful message, leave it out rather than crowd the path.
+                        $leftLength = ("$display$git" -replace "$([char]27)\[[0-9;]*m", '').Length
+                        $limit = [Math]::Min($limit, $columns - 1 - $leftLength - 2)
+                        if ($limit -ge 12) {
+                            if ($subject.Length -gt $limit) { $subject = $subject.Substring(0, $limit - 1) + '…' }
+                            $right = "$([char]27)[$($columns - $subject.Length)G$grey$subject"
+                        }
+                    }
+                    else {
+                        # Width unknown (redirected host): fall back to inline.
+                        if ($subject.Length -gt $limit) { $subject = $subject.Substring(0, $limit - 1) + '…' }
+                        $git += " · $subject"
+                    }
                 }
             }
-            $git = " $text"
         }
     }
 
@@ -350,5 +372,5 @@ function prompt {
 
     $caretColor = $succeeded ? $PSStyle.Foreground.Magenta : $PSStyle.Foreground.Red
 
-    "`n$($PSStyle.Foreground.Blue)$display$git$($PSStyle.Reset)`n$caretColor❯$($PSStyle.Reset) "
+    "`n$($PSStyle.Foreground.Blue)$display$git$right$($PSStyle.Reset)`n$caretColor❯$($PSStyle.Reset) "
 }

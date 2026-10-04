@@ -26,8 +26,8 @@ This backs up any existing `$PROFILE` to `$PROFILE.bak`, then overwrites it with
 
 | Variable | Default | Purpose |
 | --- | --- | --- |
-| `PROMPT_GIT_MESSAGE` | `1` | Show the current commit subject after the git branch (`0` to disable) |
-| `PROMPT_GIT_MESSAGE_WIDTH` | `40` | Max characters of the subject before it is cut with `…` |
+| `PROMPT_GIT_MESSAGE` | `1` | Show the current commit subject, right-aligned on the first prompt line (`0` to disable) |
+| `PROMPT_GIT_MESSAGE_WIDTH` | `72` | Max characters of the subject before it is cut with `…`. It is also cut to fit next to the path and branch, and left out when fewer than 12 characters would fit |
 | `PROMPT_GIT_STATE` | `1` | Show working tree state after the branch: staged, modified, untracked, conflicts, ahead/behind (`0` to disable) |
 | `PROMPT_GIT_STATE_TIMEOUT_MS` | `150` | How long the prompt waits for `git status` before showing the last known state |
 | `PROMPT_TAB_TITLE` | `1` | Set the terminal tab title: the prompt's path outside a git repo, `repo (branch state)` inside one, e.g. `pwsh-profile (main ↑1 ✎ ?)` (`0` to disable). State uses plain Unicode (`✕` conflicts, `↑n`/`↓n` ahead/behind, `✓` staged, `✎` modified, `?` untracked) and follows `PROMPT_GIT_STATE` |
