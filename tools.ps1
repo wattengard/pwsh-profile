@@ -5,6 +5,8 @@
 
 $toolNames = @(
     'eza'
+    'fzf'
+    'winget'
 )
 
 $global:ProfileTools = @{}
