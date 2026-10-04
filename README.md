@@ -30,6 +30,7 @@ This backs up any existing `$PROFILE` to `$PROFILE.bak`, then overwrites it with
 | `PROMPT_GIT_MESSAGE_WIDTH` | `40` | Max characters of the subject before it is cut with `…` |
 | `PROMPT_GIT_STATE` | `1` | Show working tree state after the branch: staged, modified, untracked, conflicts, ahead/behind (`0` to disable) |
 | `PROMPT_GIT_STATE_TIMEOUT_MS` | `150` | How long the prompt waits for `git status` before showing the last known state |
+| `PROMPT_TAB_TITLE` | `1` | Set the terminal tab title: the prompt's path outside a git repo, `repo (branch state)` inside one, e.g. `pwsh-profile (main ↑1 ✎ ?)` (`0` to disable). State uses plain Unicode (`✕` conflicts, `↑n`/`↓n` ahead/behind, `✓` staged, `✎` modified, `?` untracked) and follows `PROMPT_GIT_STATE` |
 
 The branch, in-progress operation and commit subject are read straight from `.git` without spawning git. The working tree state is the exception that proves the rule: it needs one `git status` per prompt, so it is time-capped, cached, and can be turned off.
 

@@ -11,6 +11,7 @@
 #   PROMPT_GIT_MESSAGE_WIDTH      max characters of the subject
 #   PROMPT_GIT_STATE              1/0  show working tree state
 #   PROMPT_GIT_STATE_TIMEOUT_MS   how long to wait for git status
+#   PROMPT_TAB_TITLE              1/0  set the terminal tab title (path, or "repo (branch state)")
 
 $script:GitIcon = @{
     Branch     = [string][char]0xF418  # nf-oct-git_branch
@@ -75,6 +76,7 @@ function script:Get-GitPromptInfo {
     elseif ([IO.File]::Exists("$gitDir/BISECT_LOG")) { 'bisect' }
 
     [pscustomobject]@{
+        Root      = $dir
         Icon      = $icon
         Name      = $name
         Operation = $operation
@@ -257,6 +259,38 @@ function script:Get-GitStatusSummary {
     $cache.Summary
 }
 
+# Terminal tab title: the prompt's path outside a repo, "repo (branch state)" inside one, e.g.
+# "pwsh-profile (main ↑1 ✎ ?)". Tabs are narrow and use the UI font, so state is compact (a
+# marker per kind, a count only for ahead/behind) and uses plain Unicode, not Nerd Font glyphs.
+# It is built from info the prompt has already read, so it costs no extra file or process work.
+$script:TitleIcon = @{
+    Conflicted = [string][char]0x2715  # ✕
+    Ahead      = [string][char]0x2191  # ↑
+    Behind     = [string][char]0x2193  # ↓
+    Staged     = [string][char]0x2713  # ✓
+    Modified   = [string][char]0x270E  # ✎
+    Untracked  = '?'
+}
+
+function script:Get-TabTitle {
+    param([string]$Display, $Info, $Summary)
+
+    if (-not $Info) { return $Display }
+    $repo = [IO.Path]::GetFileName($Info.Root.TrimEnd('\', '/'))
+    if (-not $repo) { $repo = $Info.Root }
+
+    $icon = $script:TitleIcon
+    $state = @(
+        if ($Summary.Conflicted) { $icon.Conflicted }
+        if ($Summary.Ahead) { "$($icon.Ahead)$($Summary.Ahead)" }
+        if ($Summary.Behind) { "$($icon.Behind)$($Summary.Behind)" }
+        if ($Summary.Staged) { $icon.Staged }
+        if ($Summary.Modified) { $icon.Modified }
+        if ($Summary.Untracked) { $icon.Untracked }
+    ) -join ' '
+    "$repo ($($Info.Name)$($state ? " $state" : ''))"
+}
+
 # Colored state segments, e.g. "⇡1 ✓2 ✎1 ?3", or '' when the tree is clean and in sync.
 function script:Format-GitState {
     param($Summary)
@@ -281,6 +315,8 @@ function prompt {
 
     $grey = $PSStyle.Foreground.BrightBlack
     $git = ''
+    $info = $null
+    $summary = $null
     if ($PWD.Provider.Name -eq 'FileSystem') {
         $info = Get-GitPromptInfo $path
         if ($info) {
@@ -305,6 +341,11 @@ function prompt {
             }
             $git = " $text"
         }
+    }
+
+    # Set every time, not only on change: programs like yazi leave their own title behind.
+    if ($env:PROMPT_TAB_TITLE -eq '1') {
+        try { $Host.UI.RawUI.WindowTitle = Get-TabTitle $display $info $summary } catch { }
     }
 
     $caretColor = $succeeded ? $PSStyle.Foreground.Magenta : $PSStyle.Foreground.Red

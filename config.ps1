@@ -12,6 +12,10 @@ $defaults = [ordered]@{
     # How long the prompt waits for git status, in milliseconds, before showing the last known
     # state and letting git finish in the background.
     PROMPT_GIT_STATE_TIMEOUT_MS = '150'
+    # Set the terminal tab title on every prompt: the prompt's path outside a git repo,
+    # "repo (branch state)" inside one, e.g. "pwsh-profile (main ↑1 ✎ ?)" (1 = on, 0 = off).
+    # The state part follows PROMPT_GIT_STATE.
+    PROMPT_TAB_TITLE         = '1'
 }
 
 foreach ($name in $defaults.Keys) {
