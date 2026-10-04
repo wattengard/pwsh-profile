@@ -22,7 +22,7 @@ This backs up any existing `$PROFILE` to `$PROFILE.bak`, then overwrites it with
 
 ## Configuration
 
-`config.ps1` sets defaults as environment variables. A variable already set in the environment wins, so you can override per session (`$env:PROMPT_GIT_MESSAGE = '0'`).
+`config.ps1` sets defaults as environment variables. A variable you set in the environment wins, so you can override per session (`$env:PROMPT_GIT_MESSAGE = '0'`). Reloading the profile (`. $PROFILE`) picks up changed defaults but never overwrites a value you set yourself.
 
 | Variable | Default | Purpose |
 | --- | --- | --- |

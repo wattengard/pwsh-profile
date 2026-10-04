@@ -1,5 +1,5 @@
 # Profile configuration, dot-sourced by bootstrap.ps1 before profile.d.
-# Values already set in the environment win, so you can override per session or machine.
+# Values you set in the environment win, so you can override per session or machine.
 
 $defaults = [ordered]@{
     # Show the current commit's subject after the git branch in the prompt (1 = on, 0 = off).
@@ -19,10 +19,17 @@ $defaults = [ordered]@{
     PROMPT_TAB_TITLE         = '1'
 }
 
+# Remember which values this file applied, so reloading the profile (`. $PROFILE`) after a
+# default changes picks up the new default instead of keeping the old one. A value you set
+# yourself differs from what was applied, so it is never overwritten.
+if (-not $global:ProfileConfigApplied) { $global:ProfileConfigApplied = @{} }
+
 foreach ($name in $defaults.Keys) {
-    if (-not [Environment]::GetEnvironmentVariable($name)) {
+    $current = [Environment]::GetEnvironmentVariable($name)
+    if (-not $current -or $current -eq $global:ProfileConfigApplied[$name]) {
         [Environment]::SetEnvironmentVariable($name, $defaults[$name], 'Process')
+        $global:ProfileConfigApplied[$name] = $defaults[$name]
     }
 }
 
-Remove-Variable defaults, name
+Remove-Variable defaults, name, current
