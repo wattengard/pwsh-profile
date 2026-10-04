@@ -15,7 +15,7 @@ A highly opinionated PowerShell 7 profile for Windows, rc.d style. See [README.m
 
 - `install.ps1` points `$PROFILE` at `bootstrap.ps1`. It backs up the old profile and overwrites it. Supports `-WhatIf`.
 - `bootstrap.ps1` dot-sources `config.ps1`, then `tools.ps1`, then every `profile.d\*.ps1` in name order. Keep it generic; put behavior in fragments.
-- `config.ps1` holds feature toggles as environment variables with defaults. A value the user set wins; a default it applied earlier is refreshed when the profile is reloaded (it tracks what it applied in `$global:ProfileConfigApplied`). Add new toggles there and document them in the README table.
+- `config.ps1` holds feature toggles as environment variables with defaults. A value the user set wins; a default it applied earlier is refreshed when the profile is reloaded (it tracks what it applied in `$global:ProfileConfigApplied`). Add new toggles there and document them in the README table. Name them `PROMPT_*` when they only affect the prompt and `PROFILE_*` when they cut across fragments (e.g. `PROFILE_ICONS`).
 - `tools.ps1` is the registry of optional external tools. It detects them into `$ProfileTools` (name -> path or `$null`).
 - `profile.d/NN_name.ps1` are the fragments. The numeric prefix controls load order.
 - `profile.d/80_audit.ps1` provides `Invoke-ProfileAudit` (`audit`), which reads the registry to report missing tools and install hints.
