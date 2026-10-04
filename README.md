@@ -51,3 +51,4 @@ Drop a `NN_name.ps1` file in `profile.d/`. Lower numbers load first. A fragment 
 - `50_bat.ps1`: `cat` and `type` run bat (`Invoke-Bat`) with line numbers, git change marks, a filename header, no pager and the Catppuccin Mocha theme. Use `Get-Content` when you need objects or `-Raw`/`-Tail`.
 - `50_eza.ps1`: `dir` runs eza with a compact long listing (`Invoke-Eza`).
 - `50_winget.ps1`: `wgs <query>` searches winget, picks a package in fzf, and installs it (`Search-WingetPackage`). Ctrl-P previews the highlighted package on demand. Needs winget and fzf.
+- `50_yazi.ps1`: `y` runs yazi (`Invoke-Yazi`) and changes to its last directory on quit (`q`; `Q` quits without changing). Adapted from the shell wrapper in the yazi docs.
