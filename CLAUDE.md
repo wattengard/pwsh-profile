@@ -5,7 +5,8 @@ Personal PowerShell 7 profile, rc.d style. See [README.md](README.md) for layout
 ## Structure
 
 - `install.ps1` points `$PROFILE` at `bootstrap.ps1`. It backs up the old profile and overwrites it. Supports `-WhatIf`.
-- `bootstrap.ps1` dot-sources every `profile.d\*.ps1` in name order. Keep it generic; put behavior in fragments.
+- `bootstrap.ps1` dot-sources `config.ps1`, then every `profile.d\*.ps1` in name order. Keep it generic; put behavior in fragments.
+- `config.ps1` holds feature toggles as environment variables with defaults (existing env values win). Add new toggles there and document them in the README table.
 - `profile.d/NN_name.ps1` are the fragments. Numeric prefix controls load order.
 
 ## Conventions
