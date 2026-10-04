@@ -18,6 +18,7 @@
 #   Type         bool (1 or 0), int, or choice
 #   Values       the allowed values, for choice
 #   Min          lowest allowed value, for int
+#   Max          highest allowed value, for int
 #   Group        heading to list it under
 #   Description  one line on what it does
 
@@ -42,6 +43,7 @@ $global:ProfileConfigSpecs = @(
         Default     = '72'
         Type        = 'int'
         Min         = 12
+        Max         = 500
         Group       = 'Prompt'
         Description = 'Max characters of the commit subject. It is also cut to fit beside the path and branch, and left out when fewer than 12 characters would fit.'
     }
@@ -57,6 +59,7 @@ $global:ProfileConfigSpecs = @(
         Default     = '150'
         Type        = 'int'
         Min         = 1
+        Max         = 5000
         Group       = 'Prompt'
         Description = 'How long the prompt waits for git status, in milliseconds, before showing the last known state and letting git finish in the background.'
     }

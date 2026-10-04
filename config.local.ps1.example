@@ -6,8 +6,9 @@
 #
 # Keep to one form, one setting per line:
 #     $env:NAME = 'value'
-# A trailing comment is fine. Tools that edit this file (the interactive config editor) read and
-# write exactly these lines and leave everything else, comments and other code, as it is.
+# A trailing comment is fine. You can also skip editing by hand: `cfg` (Edit-ProfileConfig) opens
+# an interactive settings screen and `Set-ProfileConfig NAME VALUE` changes one setting. Both read
+# and write exactly these lines and leave everything else, comments and other code, as it is.
 
 #$env:PROFILE_ICONS = 'plain'                # nerd (default) or plain
 #$env:PROMPT_GIT_MESSAGE_WIDTH = '100'       # characters of the commit subject

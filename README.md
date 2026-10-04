@@ -38,6 +38,18 @@ $env:PROMPT_GIT_MESSAGE_WIDTH = '100'
 
 `config.local.ps1` is applied on every load, so editing or removing a line and reloading the profile (`. $PROFILE`) takes effect, and a new default from a `git pull` reaches everything you have not overridden. Precedence, highest first: `config.local.ps1`, then a value in the environment when the shell started, then the default. A value typed into a running session (`$env:PROMPT_GIT_MESSAGE = '0'`) wins until you reload. A broken `config.local.ps1` produces a warning and the defaults still apply.
 
+### Changing settings from the shell
+
+You do not have to edit the file by hand. These commands create and update `config.local.ps1` for you, leave anything else in it untouched, and apply the change to the running shell straight away:
+
+| Command | What it does |
+| --- | --- |
+| `cfg` (`Edit-ProfileConfig`) | Interactive settings screen. `Up`/`Down` choose a setting, `Enter` changes it (a toggle flips, a choice opens a list, a number opens a spinner), `D` resets it to the default, `Esc` leaves |
+| `Get-ProfileConfig [name]` | Lists settings with their value, default and where the value comes from (`default`, `local`, `session` or `environment`). Accepts wildcards |
+| `Set-ProfileConfig NAME VALUE` | Sets one setting. The value is validated first, and Tab completes names and values. `-Reset` (or setting the default) removes the line so it follows the default again. Supports `-WhatIf` |
+
+A setting that is back on its default is not written to the file, so `config.local.ps1` only ever lists what you changed.
+
 | Variable | Default | Purpose |
 | --- | --- | --- |
 | `PROMPT_GIT_MESSAGE` | `1` | Show the current commit subject, right-aligned on the first prompt line (`0` to disable) |

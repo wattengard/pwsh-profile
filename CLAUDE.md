@@ -19,6 +19,8 @@ A highly opinionated PowerShell 7 profile for Windows, rc.d style. See [README.m
 - `tools.ps1` is the registry of optional external tools. It detects them into `$ProfileTools` (name -> path or `$null`).
 - `profile.d/NN_name.ps1` are the fragments. The numeric prefix controls load order.
 - `profile.d/80_audit.ps1` provides `Invoke-ProfileAudit` (`audit`), which reads the registry to report missing tools and install hints.
+- `profile.d/05_widgets.ps1` holds key-driven console widgets (`Read-ConsoleSelect`, `Read-ConsoleToggle`, `Read-ConsoleNumber`, `Read-ConsoleLine`) built from `[Console]::ReadKey` and ANSI escapes, no external tools. Use them for any new interactive screen instead of reaching for `Read-Host` or a GUI.
+- `profile.d/80_config.ps1` provides `Get-ProfileConfig`, `Set-ProfileConfig` and `Edit-ProfileConfig` (`cfg`) for reading and changing settings.
 
 ## Conventions
 
@@ -51,7 +53,8 @@ Settings are environment variables. `config.ps1` registers each one in `$global:
 - **Precedence**, highest first: `config.local.ps1`, a value in the environment when the shell started, the default. A value typed into a running session wins until the profile is reloaded.
 - **Reload semantics.** `$global:ProfileConfigApplied` records every value `config.ps1` applied itself (defaults and values `config.local.ps1` set). On a reload those are cleared and recomputed, so a changed default or an edited or removed line takes effect, while a value typed into the session differs from the record and is left alone.
 - **Failure.** A `config.local.ps1` that throws or does not parse produces a warning; lines before the error still apply and the defaults fill the rest.
-- **The managed file format.** `config.local.ps1` is plain PowerShell, but a tool that edits it must treat only lines of the form `$env:NAME = 'value'` (single-quoted value, optional trailing `# comment`) as settings. It changes, adds or removes only those lines, for names in the registry, and leaves everything else (comments, blank lines, other code) untouched. To reset a setting it removes the line; it should also set the variable in the running session so the change applies without a reload.
+- **The managed file format.** `config.local.ps1` is plain PowerShell, but a tool that edits it must treat only lines of the form `$env:NAME = 'value'` (single-quoted value, a doubled quote for a quote, optional trailing `# comment`) as settings. It changes, adds or removes only those lines, for names in the registry, and leaves everything else (comments, blank lines, other code, double-quoted or multi-statement lines, line endings) untouched. To reset a setting it removes the line; it also sets the variable in the running session and records it in `$ProfileConfigApplied`, so the change applies without a reload and a later reload agrees with it. A value equal to the default is stored as no line.
+- **The config commands.** `profile.d/80_config.ps1` implements that contract: `Get-ProfileConfig`, `Set-ProfileConfig` (validates against `Type`/`Values`/`Min`/`Max`, supports `-WhatIf`) and the interactive `Edit-ProfileConfig` (alias `cfg`), built on the widgets in `profile.d/05_widgets.ps1`. Add a new setting only to the registry in `config.ps1` and they pick it up; give an `int` setting a `Min` and a `Max`, because the spinner needs both.
 - **Adding a setting.** Add a spec to `config.ps1`, use `$env:NAME` in the fragment (with a safe fallback if the value is invalid), add a row to the README config table, and add it to `config.local.ps1.example` if it is commonly changed.
 
 ## Optional tools
@@ -86,11 +89,13 @@ Every feature (a single alias or a larger function) gets its own file `profile.d
 
 | Range | Use | Example |
 | --- | --- | --- |
-| `00-09` | Core shell setup | `00_prompt.ps1` |
+| `00-09` | Core shell setup, and shared helpers that other fragments build on | `00_prompt.ps1`, `05_widgets.ps1` |
 | `10-49` | Environment and shell behavior (PSReadLine, env vars, completions) | `10_psreadline.ps1` |
 | `50` | External tool integrations, one file per tool | `50_bat`, `50_eza`, `50_fzf`, `50_git`, `50_winget`, `50_yazi`, `50_zoxide` |
-| `80` | Personal functions with no external dependency | `80_audit.ps1` |
+| `80` | Personal functions with no external dependency | `80_audit.ps1`, `80_config.ps1` |
 | `90-99` | Late overrides, machine-local tweaks (name machine-only ones `NN_name.local.ps1`, which git ignores) | |
+
+**Load order and shared helpers.** Fragments load in name order, so a fragment can only use another fragment's functions or `$script:` state at load time if it is numbered after it. Using them inside a function or key handler works at any number, because the command is looked up when it runs. A fragment that calls a missing helper while loading fails with a warning (bootstrap keeps going), so put shared helpers early (`00-09`) and number their consumers after them.
 
 **File layout.** In this order:
 
@@ -148,5 +153,6 @@ Prefer one-shot, non-nesting runs: `pwsh -NoProfile -Command ". .\bootstrap.ps1;
 - **Interactive tools** (fzf, yazi and the like) cannot be driven from here. Stub the native executable with a function or a wrapper that adds `--filter` to test the surrounding logic, and tell the user plainly which parts were not exercised.
 - **PSReadLine and key bindings.** Fragments that call PSReadLine options (predictions, colors) throw when the console is redirected, so they start with `if ([Console]::IsInputRedirected -or [Console]::IsOutputRedirected) { return }`. That also means they do nothing in this shell: test them by removing the guard in a copy, proxying `Set-PSReadLineOption` to catch binding errors, and keeping the logic in testable functions (e.g. `Select-HistoryWithFzf -History ...`). Key presses cannot be simulated, so say what the user still has to try by hand.
 - **Prompt changes.** Time the prompt (`Measure-Command`) cold and cached, and confirm the only process it spawns is the capped `git status`. Test state in a throwaway repo (untracked, modified, staged, ahead/behind, a merge conflict), plus the toggle and the timeout path (`PROMPT_GIT_STATE_TIMEOUT_MS=1`). For layout, override `Get-PromptWidth` (a `script:` function) for a deterministic width and render the line through a small model of the terminal. When capturing prompt output through a tool, glyphs arrive as `?`, so map the icons to labels to tell them apart.
+- **Interactive screens can be tested with scripted keys.** The widgets read keys, write output, get the console size and check interactivity through `$script:ConsoleIO` (a table of scriptblocks). In a test, replace those entries: feed a queue of `[ConsoleKeyInfo]`, capture the output in a `StringBuilder`, and render it through a small terminal model (it has to handle cursor-up `ESC[nA`, clear line `ESC[2K`, clear to end `ESC[J`, `\r` and `\n`) to assert what ends up on screen. Keep pure line builders (`Get-ConsoleSelectLines` and the like) separate from the key loop so they test without a console. Real key presses and the look in the actual terminal still need the user.
 - **Write multi-line tests to a script file** and run it with `pwsh -NoProfile -File`. Inline `pwsh -Command '...'` from bash mangles nested quotes (a `''plain''` once became broken PowerShell and wasted a run). Inside a PowerShell `switch`, `$_` is the value being switched on, not the object you are looping over, so read the object from an explicit variable.
 - Use `pwsh -NoProfile` to rule out profile problems when something looks off.
