@@ -26,6 +26,7 @@ A highly opinionated PowerShell 7 profile for Windows, rc.d style. See [README.m
 - Fragments must not throw on load; bootstrap warns and continues, but a clean load is the goal.
 - No oh-my-posh or starship; the prompt is hand-written.
 - **The prompt must stay fast.** It must never spawn a process on the hot path. Read files directly, and where a process is unavoidable, cache the result (keyed on something that changes rarely, such as the HEAD SHA) so it runs once, not per prompt.
+  - **The one exception, which proves the rule:** the git working tree state (staged, modified, untracked, conflicts, ahead/behind) cannot be read from files, so the prompt runs a single `git status --porcelain=v2 --branch` per prompt. It is held to strict limits: it is time-capped (`PROMPT_GIT_STATE_TIMEOUT_MS`, default 150 ms; a run that outlives the cap is left running and collected on the next prompt, so the prompt never blocks longer), cached per repo while the index and HEAD are unchanged and the result is under two seconds old, and can be switched off with `PROMPT_GIT_STATE=0`. Measured here: about 35 ms for small repos and under 70 ms at 60k files. Do not add any other process to the prompt path.
 - Files are UTF-8.
 
 ## Optional tools
@@ -114,5 +115,5 @@ Prefer one-shot, non-nesting runs: `pwsh -NoProfile -Command ". .\bootstrap.ps1;
   `$env:Path = [Environment]::GetEnvironmentVariable('Path','User') + ';' + [Environment]::GetEnvironmentVariable('Path','Machine')`
 - **Present and missing.** Check the happy path, then simulate a missing tool (remove its directory from `$env:Path`, or blank its `$ProfileTools` entry) and confirm the fragment is skipped and the profile still loads.
 - **Interactive tools** (fzf, yazi and the like) cannot be driven from here. Stub the native executable with a function of the same name to test the surrounding logic, and tell the user plainly which parts were not exercised.
-- **Prompt changes.** Time the prompt (`Measure-Command`) and confirm it spawns no process on the hot path.
+- **Prompt changes.** Time the prompt (`Measure-Command`) cold and cached, and confirm the only process it spawns is the capped `git status`. Test state in a throwaway repo (untracked, modified, staged, ahead/behind, a merge conflict), plus the toggle and the timeout path (`PROMPT_GIT_STATE_TIMEOUT_MS=1`). When capturing prompt output through a tool, glyphs arrive as `?`, so map the icons to labels to tell them apart.
 - Use `pwsh -NoProfile` to rule out profile problems when something looks off.

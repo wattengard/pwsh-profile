@@ -42,6 +42,12 @@ $global:ProfileToolSpecs = @(
         Winget      = 'junegunn.fzf'
     }
     [ordered]@{
+        Name        = 'git'
+        Description = 'version control; the prompt runs git status for working tree state'
+        Url         = 'https://git-scm.com'
+        Winget      = 'Git.Git'
+    }
+    [ordered]@{
         Name        = 'winget'
         Description = 'Windows package manager'
         Url         = 'https://github.com/microsoft/winget-cli'

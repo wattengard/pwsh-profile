@@ -6,6 +6,12 @@ $defaults = [ordered]@{
     PROMPT_GIT_MESSAGE       = '1'
     # Max characters of the commit subject to show; longer subjects are cut with an ellipsis.
     PROMPT_GIT_MESSAGE_WIDTH = '40'
+    # Show working tree state (staged, modified, untracked, conflicts, ahead/behind) after the
+    # branch. Runs one time-capped git status per prompt (1 = on, 0 = off).
+    PROMPT_GIT_STATE         = '1'
+    # How long the prompt waits for git status, in milliseconds, before showing the last known
+    # state and letting git finish in the background.
+    PROMPT_GIT_STATE_TIMEOUT_MS = '150'
 }
 
 foreach ($name in $defaults.Keys) {
