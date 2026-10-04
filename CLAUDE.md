@@ -7,7 +7,7 @@ Personal PowerShell 7 profile, rc.d style. See [README.md](README.md) for layout
 - `install.ps1` points `$PROFILE` at `bootstrap.ps1`. It backs up the old profile and overwrites it. Supports `-WhatIf`.
 - `bootstrap.ps1` dot-sources `config.ps1`, then every `profile.d\*.ps1` in name order. Keep it generic; put behavior in fragments.
 - `config.ps1` holds feature toggles as environment variables with defaults (existing env values win). Add new toggles there and document them in the README table.
-- `tools.ps1` detects optional external tools into `$ProfileTools` (name -> path or `$null`). Any alias, function or other behavior that depends on an external tool must be guarded with `if ($ProfileTools.<tool>)` so the profile degrades cleanly when it is not installed. Register new tools in the list in `tools.ps1`.
+- `tools.ps1` detects optional external tools into `$ProfileTools` (name -> path or `$null`). Any alias, function or other behavior that depends on an external tool must be guarded with `if ($ProfileTools.<tool>)` so the profile degrades cleanly when it is not installed. Register new tools by adding a spec (Name, Description, Url, Winget id, optional Hint/Path) to `$ProfileToolSpecs` in `tools.ps1`; `Invoke-ProfileAudit` (`profile.d/80_audit.ps1`) reads that registry to report missing tools and install hints, so keep the specs accurate.
 - `profile.d/NN_name.ps1` are the fragments. Numeric prefix controls load order.
 
 ## Conventions

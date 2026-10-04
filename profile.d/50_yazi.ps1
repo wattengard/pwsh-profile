@@ -1,10 +1,8 @@
 if (-not $ProfileTools.yazi) { return }
 
 # yazi needs file(1) for mime-type detection; the docs recommend the one bundled with Git for Windows.
-if (-not $env:YAZI_FILE_ONE) {
-    $gitFile = Join-Path $env:ProgramFiles 'Git\usr\bin\file.exe'
-    if (Test-Path -LiteralPath $gitFile) { $env:YAZI_FILE_ONE = $gitFile }
-    Remove-Variable gitFile
+if (-not $env:YAZI_FILE_ONE -and $ProfileTools.file) {
+    $env:YAZI_FILE_ONE = $ProfileTools.file
 }
 
 function Invoke-Yazi {

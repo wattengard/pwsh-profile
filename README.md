@@ -17,7 +17,7 @@ This backs up any existing `$PROFILE` to `$PROFILE.bak`, then overwrites it with
 | `install.ps1` | Points `$PROFILE` at `bootstrap.ps1` |
 | `bootstrap.ps1` | Dot-sources `config.ps1`, `tools.ps1`, then every `profile.d\*.ps1` in name order |
 | `config.ps1` | Default environment variables that toggle features |
-| `tools.ps1` | Detects optional external tools (e.g. `eza`) and records their paths |
+| `tools.ps1` | Registry of optional external tools (e.g. `eza`); detects them and records their paths |
 | `profile.d/` | Profile fragments, loaded in order (`00_prompt.ps1`, ...) |
 
 ## Configuration
@@ -31,7 +31,7 @@ This backs up any existing `$PROFILE` to `$PROFILE.bak`, then overwrites it with
 
 ## Optional tools
 
-`tools.ps1` lists the external programs the profile can use and looks each one up on PATH once at startup. The result is `$ProfileTools`, a hashtable of tool name to full path, with `$null` for a missing tool. Fragments gate anything that depends on a tool:
+`tools.ps1` holds a registry of the external programs the profile can use: name, description, project URL and winget package id. Each one is looked up once at startup. The result is `$ProfileTools`, a hashtable of tool name to full path, with `$null` for a missing tool. Fragments gate anything that depends on a tool:
 
 ```powershell
 if ($ProfileTools.eza) {
@@ -39,7 +39,11 @@ if ($ProfileTools.eza) {
 }
 ```
 
-To support a new tool, add its name to the list in `tools.ps1`.
+To support a new tool, add an entry to `$ProfileToolSpecs` in `tools.ps1`.
+
+### Audit
+
+Run `audit` (`Invoke-ProfileAudit`) to see which tools were found. Each missing tool is listed with what it does, an install command and its project page. It reports what the current shell saw at startup, so open a new shell after installing. `audit -PassThru` also returns the results as objects.
 
 ## Adding a fragment
 
