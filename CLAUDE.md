@@ -1,22 +1,56 @@
 # CLAUDE.md
 
-Personal PowerShell 7 profile, rc.d style. See [README.md](README.md) for layout.
+A highly opinionated PowerShell 7 profile for Windows, rc.d style. See [README.md](README.md) for layout and usage.
+
+## Working rules
+
+- **Never commit unless explicitly asked.** Make the change, describe it, and wait for the user to say to commit. The same goes for pushing and anything else outward-facing (creating or editing remote repos, releases, issues, pull requests). Approval for one commit does not carry over to the next.
+- **This repo is public.** Never commit secrets, tokens, personal data, usernames or machine-specific absolute paths. Use `$PSScriptRoot`, `$env:USERPROFILE`, `$env:ProgramFiles` and the like.
+- **Commit identity.** Commits use the author email set in this repo's local git config, which must be a GitHub noreply address. Do not change it, do not override it per commit, and never use a personal email.
+- Commit messages follow [Conventional Commits](#commits) and end with the attribution trailer the session provides.
 
 ## Structure
 
 - `install.ps1` points `$PROFILE` at `bootstrap.ps1`. It backs up the old profile and overwrites it. Supports `-WhatIf`.
-- `bootstrap.ps1` dot-sources `config.ps1`, then every `profile.d\*.ps1` in name order. Keep it generic; put behavior in fragments.
+- `bootstrap.ps1` dot-sources `config.ps1`, then `tools.ps1`, then every `profile.d\*.ps1` in name order. Keep it generic; put behavior in fragments.
 - `config.ps1` holds feature toggles as environment variables with defaults (existing env values win). Add new toggles there and document them in the README table.
-- `tools.ps1` detects optional external tools into `$ProfileTools` (name -> path or `$null`). Any alias, function or other behavior that depends on an external tool must be guarded with `if ($ProfileTools.<tool>)` so the profile degrades cleanly when it is not installed. Register new tools by adding a spec (Name, Description, Url, Winget id, optional Hint/Path) to `$ProfileToolSpecs` in `tools.ps1`; `Invoke-ProfileAudit` (`profile.d/80_audit.ps1`) reads that registry to report missing tools and install hints, so keep the specs accurate.
-- `profile.d/NN_name.ps1` are the fragments. Numeric prefix controls load order.
+- `tools.ps1` is the registry of optional external tools. It detects them into `$ProfileTools` (name -> path or `$null`).
+- `profile.d/NN_name.ps1` are the fragments. The numeric prefix controls load order.
+- `profile.d/80_audit.ps1` provides `Invoke-ProfileAudit` (`audit`), which reads the registry to report missing tools and install hints.
 
 ## Conventions
 
-- Target PowerShell 7+ only (ternary, `$PSStyle`, etc. are fine).
-- Fragments are plain `.ps1` files that are dot-sourced, not modules. They share the profile's scope, so define functions (e.g. `prompt`) at the top level and avoid leaking stray variables.
+- Windows and PowerShell 7+ only (ternary, `$PSStyle`, winget, Git for Windows paths are all fine to assume).
+- Fragments are plain `.ps1` files that are dot-sourced, not modules. They share the profile's scope, so define functions (e.g. `prompt`) at the top level.
+- Scope: private helpers use `script:` scope, shared state uses an explicit `$global:` (as `$ProfileTools` does), and a fragment removes its own temporary variables (`Remove-Variable`) so nothing stray leaks into the session.
 - Fragments must not throw on load; bootstrap warns and continues, but a clean load is the goal.
 - No oh-my-posh or starship; the prompt is hand-written.
-- Files are UTF-8; keep the repo free of machine-specific absolute paths (use `$PSScriptRoot`).
+- **The prompt must stay fast.** It must never spawn a process on the hot path. Read files directly, and where a process is unavoidable, cache the result (keyed on something that changes rarely, such as the HEAD SHA) so it runs once, not per prompt.
+- Files are UTF-8.
+
+## Optional tools
+
+Any alias, function or other behavior that depends on an external tool must be guarded with `if ($ProfileTools.<tool>)` so the profile degrades cleanly when the tool is not installed.
+
+Register a tool by adding a spec to `$ProfileToolSpecs` in `tools.ps1`:
+
+| Field | Meaning |
+| --- | --- |
+| `Name` | Key in `$ProfileTools`; also the command looked up on PATH |
+| `Description` | What the tool does |
+| `Url` | Project page |
+| `Winget` | winget package id, used for the install hint |
+| `Hint` | (optional) install hint to show instead of the winget one |
+| `Path` | (optional) look here instead of on PATH, for tools bundled with something else |
+
+The audit reads these specs, so keep them accurate.
+
+**Checklist for a new tool integration:**
+
+1. Add the spec to `tools.ps1`.
+2. Write `profile.d/50_<tool>.ps1` following the layout below, with the guard.
+3. Add a row to the README "Tools used" table, and any toggle to the README config table.
+4. Test with the tool present and with it missing (see Testing).
 
 ## Feature fragments
 
@@ -24,23 +58,23 @@ Every feature (a single alias or a larger function) gets its own file `profile.d
 
 **Numbering.** The prefix sets load order and groups by kind. Fragments in the same group share a number and load alphabetically within it, so independent features do not need unique numbers.
 
-| Range | Use |
-| --- | --- |
-| `00-09` | Core shell setup (prompt) |
-| `10-49` | Environment and shell behavior (PSReadLine, env vars, completions) |
-| `50` | External tool integrations, one file per tool (eza, ...) |
-| `80` | Personal functions with no external dependency |
-| `90-99` | Late overrides, machine-local tweaks |
+| Range | Use | Example |
+| --- | --- | --- |
+| `00-09` | Core shell setup | `00_prompt.ps1` |
+| `10-49` | Environment and shell behavior (PSReadLine, env vars, completions) | |
+| `50` | External tool integrations, one file per tool | `50_bat`, `50_eza`, `50_winget`, `50_yazi` |
+| `80` | Personal functions with no external dependency | `80_audit.ps1` |
+| `90-99` | Late overrides, machine-local tweaks | |
 
 **File layout.** In this order:
 
-1. A comment-based help block describing the feature (`.SYNOPSIS`, `.DESCRIPTION`, and `.NOTES` with `Requires:` and `Aliases:` lines). It sits inside the function so `Get-Help` works.
-2. A guard that exits the fragment early if a required tool is missing: `if (-not $ProfileTools.<tool>) { return }`. Fragments are dot-sourced, so `return` only ends that file.
-3. The function, named `Verb-Subject` with an approved verb (`Get-Verb`). Wrappers around an external program use `Invoke-`, e.g. `Invoke-Eza`. It passes `@args` through so callers can add flags.
-4. If the alias shadows a built-in, remove the built-in first: `Remove-Alias <name> -Force -ErrorAction Ignore`.
+1. A guard that exits the fragment early if a required tool is missing: `if (-not $ProfileTools.<tool>) { return }`. Fragments are dot-sourced, so `return` only ends that file.
+2. Tool-specific environment variables (e.g. `EZA_CONFIG_DIR`), right after the guard.
+3. The function, named `Verb-Subject` with an approved verb (`Get-Verb`). Wrappers around an external program use `Invoke-`, e.g. `Invoke-Eza`. It passes `@args` through so callers can add flags. A comment-based help block sits inside the function so `Get-Help` works: `.SYNOPSIS`, `.DESCRIPTION`, and `.NOTES` with `Requires:` and `Aliases:` lines.
+4. If an alias shadows a built-in, remove the built-in first: `Remove-Alias <name> -Force -ErrorAction Ignore`.
 5. `Set-Alias -Name <short> -Value <Verb-Subject>` to give the function its short name.
 
-A tool with several aliases keeps them all in one file: group all the functions first, then all the `Remove-Alias` / `Set-Alias` lines at the bottom. Tool-specific environment variables (e.g. `EZA_CONFIG_DIR`) also go in that file, right after the guard.
+A tool with several aliases keeps them all in one file: group all the functions first, then all the `Remove-Alias` / `Set-Alias` lines at the bottom.
 
 Aliases cannot carry arguments in PowerShell, which is why even a one-liner gets a function and the alias points at it.
 
@@ -48,17 +82,20 @@ Aliases cannot carry arguments in PowerShell, which is why even a one-liner gets
 # profile.d/50_eza.ps1
 if (-not $ProfileTools.eza) { return }
 
+$env:EZA_CONFIG_DIR = Join-Path $env:USERPROFILE '.config\eza'
+
 function Invoke-Eza {
     <#
     .SYNOPSIS
-        eza with preferred defaults.
+        eza as a compact long listing with icons.
     .DESCRIPTION
-        Lists directory contents with eza instead of Get-ChildItem.
+        Long format including hidden files, without user, time or permissions columns,
+        with hyperlinks and unquoted names. Extra arguments are passed through to eza.
     .NOTES
         Requires: eza
         Aliases: dir
     #>
-    eza --group-directories-first @args
+    eza -l --icons --no-user --no-time --no-permissions -a --hyperlink --no-quotes @args
 }
 
 Remove-Alias dir -Force -ErrorAction Ignore
@@ -71,4 +108,11 @@ Use [Conventional Commits](https://www.conventionalcommits.org/): `type(scope): 
 
 ## Testing
 
-Open a new `pwsh` session, or run `. .\bootstrap.ps1` in the current one. Use `pwsh -NoProfile` to rule out profile problems.
+Prefer one-shot, non-nesting runs: `pwsh -NoProfile -Command ". .\bootstrap.ps1; <what to check>"`. Do not start nested `pwsh` sessions. In the user's own shell, open a new session or run `. .\bootstrap.ps1`.
+
+- **Stale PATH.** A long-running session (including the Claude Code shell) does not see tools installed after it started, so detection reports them missing. Refresh PATH from the registry first:
+  `$env:Path = [Environment]::GetEnvironmentVariable('Path','User') + ';' + [Environment]::GetEnvironmentVariable('Path','Machine')`
+- **Present and missing.** Check the happy path, then simulate a missing tool (remove its directory from `$env:Path`, or blank its `$ProfileTools` entry) and confirm the fragment is skipped and the profile still loads.
+- **Interactive tools** (fzf, yazi and the like) cannot be driven from here. Stub the native executable with a function of the same name to test the surrounding logic, and tell the user plainly which parts were not exercised.
+- **Prompt changes.** Time the prompt (`Measure-Command`) and confirm it spawns no process on the hot path.
+- Use `pwsh -NoProfile` to rule out profile problems when something looks off.
