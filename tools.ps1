@@ -8,12 +8,13 @@
 # The audit command (profile.d\80_audit.ps1) reads the same registry to report what is missing.
 #
 # Spec fields:
-#   Name         key in $ProfileTools; also the command looked up on PATH
+#   Name         key in $ProfileTools; also the command looked up on PATH (<name>.exe or <name>.cmd)
 #   Description  what the tool does
 #   Url          project page
 #   Winget       winget package id, used to build the install hint
 #   Hint         install hint to show instead of the winget one (for tools winget cannot install)
-#   Path         look here instead of on PATH (for tools that are bundled with something else)
+#   Path         look here instead of on PATH (for tools bundled with something else, or shipped
+#                with an extension other than .exe/.cmd)
 
 $global:ProfileToolSpecs = @(
     [ordered]@{
@@ -61,15 +62,30 @@ $global:ProfileToolSpecs = @(
     }
 )
 
+# Lookup checks for "<name>.exe" and "<name>.cmd" in each PATH folder in order (first match
+# wins, like the shell). That covers real binaries and npm/scoop-style shims in a few ms, and the
+# cost is the same whether or not a tool is installed. There is deliberately no Get-Command
+# fallback: it takes about 85 ms for each tool it cannot find, and probing every PATHEXT
+# extension per folder is slower still. A tool shipped with another extension (.bat, .com) is
+# reported missing; give its spec a Path to point at it directly.
+$toolDirs = $env:Path -split ';' | ForEach-Object { $_.Trim().Trim('"') } | Where-Object { $_ } | Select-Object -Unique
+$toolExts = '.exe', '.cmd'
+
 $global:ProfileTools = @{}
 foreach ($spec in $global:ProfileToolSpecs) {
-    $global:ProfileTools[$spec.Name] = if ($spec.Path) {
-        (Test-Path -LiteralPath $spec.Path) ? $spec.Path : $null
+    $found = $null
+    if ($spec.Path) {
+        if ([IO.File]::Exists($spec.Path)) { $found = $spec.Path }
     }
     else {
-        Get-Command $spec.Name -CommandType Application -ErrorAction Ignore |
-            Select-Object -First 1 -ExpandProperty Source
+        :search foreach ($dir in $toolDirs) {
+            foreach ($ext in $toolExts) {
+                $candidate = [IO.Path]::Combine($dir, $spec.Name + $ext)
+                if ([IO.File]::Exists($candidate)) { $found = $candidate; break search }
+            }
+        }
     }
+    $global:ProfileTools[$spec.Name] = $found
 }
 
-Remove-Variable spec
+Remove-Variable spec, found, dir, ext, candidate, toolDirs, toolExts -ErrorAction Ignore
