@@ -60,6 +60,12 @@ $global:ProfileToolSpecs = @(
         Url         = 'https://github.com/sxyazi/yazi'
         Winget      = 'sxyazi.yazi'
     }
+    [ordered]@{
+        Name        = 'zoxide'
+        Description = 'smarter cd that learns your most used directories'
+        Url         = 'https://github.com/ajeetdsouza/zoxide'
+        Winget      = 'ajeetdsouza.zoxide'
+    }
 )
 
 # Lookup checks for "<name>.exe" and "<name>.cmd" in each PATH folder in order (first match
