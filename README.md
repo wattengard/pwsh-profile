@@ -47,7 +47,6 @@ Drop a `NN_name.ps1` file in `profile.d/`. Lower numbers load first. A fragment 
 
 ## Current fragments
 
+- `00_prompt.ps1`: two-line prompt modeled on [pure](https://github.com/sindresorhus/pure). Path on the first line, `❯` on the second, red when the last command failed. Shows the git branch and in-progress state (rebase, merge, ...) plus the current commit subject, read straight from `.git` without spawning git on the hot path (reflog, then loose object, then a cached `git log` for packed commits).
 - `50_eza.ps1`: `dir` runs eza with a compact long listing (`Invoke-Eza`).
 - `50_winget.ps1`: `wgs <query>` searches winget, picks a package in fzf, and installs it (`Search-WingetPackage`). Ctrl-P previews the highlighted package on demand. Needs winget and fzf.
-
-- `00_prompt.ps1`: two-line prompt modeled on [pure](https://github.com/sindresorhus/pure). Path on the first line, `❯` on the second, red when the last command failed. Shows the git branch and in-progress state (rebase, merge, ...) plus the current commit subject, read straight from `.git` without spawning git on the hot path (reflog, then loose object, then a cached `git log` for packed commits).
