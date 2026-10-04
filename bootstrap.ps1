@@ -1,14 +1,18 @@
 # Entry point for the personal PowerShell profile. Dot-sourced from $PROFILE.
-# Sources config.ps1, then every profile.d\*.ps1 in name order (rc.d style).
+# Sources config.ps1, tools.ps1, then every profile.d\*.ps1 in name order (rc.d style).
 
-$config = Join-Path $PSScriptRoot 'config.ps1'
-if (Test-Path $config) { . $config }
+foreach ($bootstrapFile in 'config.ps1', 'tools.ps1') {
+    $bootstrapPath = Join-Path $PSScriptRoot $bootstrapFile
+    if (Test-Path $bootstrapPath) { . $bootstrapPath }
+}
 
-foreach ($file in Get-ChildItem -Path (Join-Path $PSScriptRoot 'profile.d') -Filter '*.ps1' -File | Sort-Object Name) {
+foreach ($bootstrapFile in Get-ChildItem -Path (Join-Path $PSScriptRoot 'profile.d') -Filter '*.ps1' -File | Sort-Object Name) {
     try {
-        . $file.FullName
+        . $bootstrapFile.FullName
     }
     catch {
-        Write-Warning "Failed to load $($file.Name): $_"
+        Write-Warning "Failed to load $($bootstrapFile.Name): $_"
     }
 }
+
+Remove-Variable bootstrapFile, bootstrapPath -ErrorAction Ignore

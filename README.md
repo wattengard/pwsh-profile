@@ -15,8 +15,9 @@ This backs up any existing `$PROFILE` to `$PROFILE.bak`, then overwrites it with
 | Path | Purpose |
 | --- | --- |
 | `install.ps1` | Points `$PROFILE` at `bootstrap.ps1` |
-| `bootstrap.ps1` | Dot-sources `config.ps1`, then every `profile.d\*.ps1` in name order |
+| `bootstrap.ps1` | Dot-sources `config.ps1`, `tools.ps1`, then every `profile.d\*.ps1` in name order |
 | `config.ps1` | Default environment variables that toggle features |
+| `tools.ps1` | Detects optional external tools (e.g. `eza`) and records their paths |
 | `profile.d/` | Profile fragments, loaded in order (`00_prompt.ps1`, ...) |
 
 ## Configuration
@@ -27,6 +28,18 @@ This backs up any existing `$PROFILE` to `$PROFILE.bak`, then overwrites it with
 | --- | --- | --- |
 | `PROMPT_GIT_MESSAGE` | `1` | Show the current commit subject after the git branch (`0` to disable) |
 | `PROMPT_GIT_MESSAGE_WIDTH` | `40` | Max characters of the subject before it is cut with `…` |
+
+## Optional tools
+
+`tools.ps1` lists the external programs the profile can use and looks each one up on PATH once at startup. The result is `$ProfileTools`, a hashtable of tool name to full path, with `$null` for a missing tool. Fragments gate anything that depends on a tool:
+
+```powershell
+if ($ProfileTools.eza) {
+    # aliases and functions that use eza
+}
+```
+
+To support a new tool, add its name to the list in `tools.ps1`.
 
 ## Adding a fragment
 
