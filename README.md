@@ -52,13 +52,14 @@ Run `audit` (`Invoke-ProfileAudit`) to see which tools were found. Each missing 
 
 ## Key bindings
 
-Set up in `profile.d/10_psreadline.ps1` (PSReadLine) and `profile.d/50_fzf.ps1`:
+Set up in `profile.d/10_psreadline.ps1` (PSReadLine), `profile.d/50_fzf.ps1` and `profile.d/50_git.ps1`:
 
 | Key | Action |
 | --- | --- |
 | `Up` / `Down` | Search history for the text already typed |
 | `Tab` | Navigable completion menu |
 | `Ctrl+R` | Search history with fzf (needs fzf); `Ctrl+R` again inside fzf toggles between recency and match order. The chosen command is placed on the command line, not run |
+| `Ctrl+G` | Pick a git branch with fzf (needs git and fzf) and put `git switch ...` on the command line, without running it. Local branches show a desktop icon, remote ones a globe; `Ctrl+P` toggles a log preview. A remote branch with no local copy gives `git switch --track origin/<name>`. Remote branches are as of your last fetch |
 
 Predictions from history show inline as gray text (`Right Arrow` accepts). Lines that look like they contain secrets (password, token, API key, ...) are kept out of the history file. The PSReadLine part only applies in an interactive console.
 
