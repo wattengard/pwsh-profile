@@ -4,6 +4,7 @@
 #   if ($ProfileTools.eza) { ... }        # $ProfileTools.eza is the full path, or $null if missing
 
 $toolNames = @(
+    'bat'
     'eza'
     'fzf'
     'winget'
