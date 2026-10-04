@@ -62,8 +62,8 @@ Every feature (a single alias or a larger function) gets its own file `profile.d
 | Range | Use | Example |
 | --- | --- | --- |
 | `00-09` | Core shell setup | `00_prompt.ps1` |
-| `10-49` | Environment and shell behavior (PSReadLine, env vars, completions) | |
-| `50` | External tool integrations, one file per tool | `50_bat`, `50_eza`, `50_winget`, `50_yazi` |
+| `10-49` | Environment and shell behavior (PSReadLine, env vars, completions) | `10_psreadline.ps1` |
+| `50` | External tool integrations, one file per tool | `50_bat`, `50_eza`, `50_fzf`, `50_winget`, `50_yazi` |
 | `80` | Personal functions with no external dependency | `80_audit.ps1` |
 | `90-99` | Late overrides, machine-local tweaks | |
 
@@ -115,5 +115,6 @@ Prefer one-shot, non-nesting runs: `pwsh -NoProfile -Command ". .\bootstrap.ps1;
   `$env:Path = [Environment]::GetEnvironmentVariable('Path','User') + ';' + [Environment]::GetEnvironmentVariable('Path','Machine')`
 - **Present and missing.** Check the happy path, then simulate a missing tool (remove its directory from `$env:Path`, or blank its `$ProfileTools` entry) and confirm the fragment is skipped and the profile still loads.
 - **Interactive tools** (fzf, yazi and the like) cannot be driven from here. Stub the native executable with a function of the same name to test the surrounding logic, and tell the user plainly which parts were not exercised.
+- **PSReadLine and key bindings.** Fragments that call PSReadLine options (predictions, colors) throw when the console is redirected, so they start with `if ([Console]::IsInputRedirected -or [Console]::IsOutputRedirected) { return }`. That also means they do nothing in this shell: test them by removing the guard in a copy, proxying `Set-PSReadLineOption` to catch binding errors, and keeping the logic in testable functions (e.g. `Select-HistoryWithFzf -History ...`, with fzf run through a wrapper that adds `--filter`). Key presses cannot be simulated, so say what the user still has to try by hand.
 - **Prompt changes.** Time the prompt (`Measure-Command`) cold and cached, and confirm the only process it spawns is the capped `git status`. Test state in a throwaway repo (untracked, modified, staged, ahead/behind, a merge conflict), plus the toggle and the timeout path (`PROMPT_GIT_STATE_TIMEOUT_MS=1`). When capturing prompt output through a tool, glyphs arrive as `?`, so map the icons to labels to tell them apart.
 - Use `pwsh -NoProfile` to rule out profile problems when something looks off.

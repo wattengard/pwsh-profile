@@ -50,6 +50,18 @@ To support a new tool, add an entry to `$ProfileToolSpecs` in `tools.ps1`.
 
 Run `audit` (`Invoke-ProfileAudit`) to see which tools were found. Each missing tool is listed with what it does, an install command and its project page. It reports what the current shell saw at startup, so open a new shell after installing. `audit -PassThru` also returns the results as objects.
 
+## Key bindings
+
+Set up in `profile.d/10_psreadline.ps1` (PSReadLine) and `profile.d/50_fzf.ps1`:
+
+| Key | Action |
+| --- | --- |
+| `Up` / `Down` | Search history for the text already typed |
+| `Tab` | Navigable completion menu |
+| `Ctrl+R` | Search history with fzf (needs fzf); `Ctrl+R` again inside fzf toggles between recency and match order. The chosen command is placed on the command line, not run |
+
+Predictions from history show inline as gray text (`Right Arrow` accepts). Lines that look like they contain secrets (password, token, API key, ...) are kept out of the history file. The PSReadLine part only applies in an interactive console.
+
 ## Adding a fragment
 
 Drop a `NN_name.ps1` file in `profile.d/`. Lower numbers load first. A fragment that throws produces a warning and the rest still load.
@@ -63,7 +75,7 @@ Every tool is optional. A fragment that depends on one is skipped when it is not
 | [eza](https://github.com/eza-community/eza) | A modern replacement for `ls` with icons and git awareness | `dir` |
 | [bat](https://github.com/sharkdp/bat) | A `cat` clone with syntax highlighting and git integration | `cat`, `type` |
 | [yazi](https://github.com/sxyazi/yazi) | A fast terminal file manager | `y`, which changes to yazi's last directory on quit |
-| [fzf](https://github.com/junegunn/fzf) | A command-line fuzzy finder | Picking a package in `wgs` |
+| [fzf](https://github.com/junegunn/fzf) | A command-line fuzzy finder | `Ctrl+R` history search, and picking a package in `wgs` |
 | [winget](https://github.com/microsoft/winget-cli) | The Windows package manager | `wgs <query>` searches and installs |
 | [Git for Windows](https://gitforwindows.org) | Git and a bundled Unix toolset | `git status` for the prompt's working tree state, and its `file.exe` gives yazi mime-type detection |
 | [Nerd Fonts](https://www.nerdfonts.com) | Fonts patched with icon glyphs | Prompt branch icon and the icons in eza |
