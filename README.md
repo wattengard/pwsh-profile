@@ -45,13 +45,21 @@ To support a new tool, add its name to the list in `tools.ps1`.
 
 Drop a `NN_name.ps1` file in `profile.d/`. Lower numbers load first. A fragment that throws produces a warning and the rest still load.
 
-## Current fragments
+## Tools used
 
-- `00_prompt.ps1`: two-line prompt modeled on [pure](https://github.com/sindresorhus/pure). Path on the first line, `❯` on the second, red when the last command failed. Shows the git branch and in-progress state (rebase, merge, ...) plus the current commit subject, read straight from `.git` without spawning git on the hot path (reflog, then loose object, then a cached `git log` for packed commits).
-- `50_bat.ps1`: `cat` and `type` run bat (`Invoke-Bat`) with line numbers, git change marks, a filename header, no pager and the Catppuccin Mocha theme. Use `Get-Content` when you need objects or `-Raw`/`-Tail`.
-- `50_eza.ps1`: `dir` runs eza with a compact long listing (`Invoke-Eza`).
-- `50_winget.ps1`: `wgs <query>` searches winget, picks a package in fzf, and installs it (`Search-WingetPackage`). Ctrl-P previews the highlighted package on demand. Needs winget and fzf.
-- `50_yazi.ps1`: `y` runs yazi (`Invoke-Yazi`) and changes to its last directory on quit (`q`; `Q` quits without changing). Adapted from the shell wrapper in the yazi docs.
+Every tool is optional. A fragment that depends on one is skipped when it is not installed (see [Optional tools](#optional-tools)).
+
+| Tool | What it does | Used for |
+| --- | --- | --- |
+| [eza](https://github.com/eza-community/eza) | A modern replacement for `ls` with icons and git awareness | `dir` |
+| [bat](https://github.com/sharkdp/bat) | A `cat` clone with syntax highlighting and git integration | `cat`, `type` |
+| [yazi](https://github.com/sxyazi/yazi) | A fast terminal file manager | `y`, which changes to yazi's last directory on quit |
+| [fzf](https://github.com/junegunn/fzf) | A command-line fuzzy finder | Picking a package in `wgs` |
+| [winget](https://github.com/microsoft/winget-cli) | The Windows package manager | `wgs <query>` searches and installs |
+| [Git for Windows](https://gitforwindows.org) | Git and a bundled Unix toolset | Its `file.exe` gives yazi mime-type detection |
+| [Nerd Fonts](https://www.nerdfonts.com) | Fonts patched with icon glyphs | Prompt branch icon and the icons in eza |
+| [Catppuccin](https://catppuccin.com) | A pastel color theme | Mocha theme for bat |
+| [pure](https://github.com/sindresorhus/pure) | A minimal two-line zsh prompt | Inspiration for the prompt in `00_prompt.ps1` |
 
 ## License
 
