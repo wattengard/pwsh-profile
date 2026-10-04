@@ -3,9 +3,12 @@ if (-not $ProfileTools.zoxide) { return }
 # Directories zoxide should never learn: home itself and temp folders.
 if (-not $env:_ZO_EXCLUDE_DIRS) { $env:_ZO_EXCLUDE_DIRS = "$HOME;$env:TEMP;$env:TEMP\*" }
 
-# cdi's fzf window previews the highlighted directory with eza, when eza is available.
+# cdi's fzf window previews the highlighted directory with eza, when eza is available. The icons
+# follow PROFILE_ICONS as it is when the profile loads (reload to apply a change).
 if (-not $env:_ZO_FZF_OPTS -and $ProfileTools.eza) {
-    $env:_ZO_FZF_OPTS = "--preview='eza --tree --level=1 --icons --color=always {2..}' --preview-window=right,40%"
+    $zoxideIcons = $env:PROFILE_ICONS -eq 'plain' ? '' : '--icons '
+    $env:_ZO_FZF_OPTS = "--preview='eza --tree --level=1 ${zoxideIcons}--color=always {2..}' --preview-window=right,40%"
+    Remove-Variable zoxideIcons
 }
 
 # This defines the global functions and sets the aliases:

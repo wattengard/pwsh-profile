@@ -1,8 +1,9 @@
 if (-not ($ProfileTools.git -and $ProfileTools.fzf)) { return }
 
-$script:GitBranchIcon = @{
-    Local  = [string][char]0xF108  # nf-fa-desktop
-    Remote = [string][char]0xF0AC  # nf-fa-globe
+# Picked per call from PROFILE_ICONS: Nerd Font glyphs, or letters when 'plain'.
+$script:GitBranchIcons = @{
+    nerd  = @{ Local = [string][char]0xF108; Remote = [string][char]0xF0AC }  # nf-fa-desktop, nf-fa-globe
+    plain = @{ Local = 'L'; Remote = 'R' }
 }
 
 function Select-GitBranch {
@@ -11,7 +12,8 @@ function Select-GitBranch {
         Pick a local or remote branch with fzf and return the git switch command for it.
     .DESCRIPTION
         Lists every local branch and every remote-tracking branch, newest commit first, with a
-        desktop icon for local and a globe for remote. Returns the command text and does not run
+        desktop icon for local and a globe for remote (the letters L and R when PROFILE_ICONS
+        is 'plain'). Returns the command text and does not run
         it: "git switch <branch>" for a local branch (or a remote one that already has a local
         twin), and "git switch --track <remote>/<branch>" for a remote branch with no local copy.
         Bound to Ctrl+G, which puts the command on the command line for you to review and run.
@@ -46,12 +48,14 @@ function Select-GitBranch {
     $localNames = [Collections.Generic.HashSet[string]]::new([string[]]@($entries | Where-Object Local | ForEach-Object Name))
     $nameWidth = [Math]::Min(40, ($entries | ForEach-Object { $_.Short.Length } | Measure-Object -Maximum).Maximum)
     $fg = $PSStyle.Foreground
+    $plain = $env:PROFILE_ICONS -eq 'plain'
+    $icons = $plain ? $script:GitBranchIcons.plain : $script:GitBranchIcons.nerd
 
     # Local first, then remote; each group keeps the newest-first order from for-each-ref.
     $ordered = @($entries | Where-Object Local) + @($entries | Where-Object { -not $_.Local })
     $rows = for ($i = 0; $i -lt $ordered.Count; $i++) {
         $e = $ordered[$i]
-        $icon = $e.Local ? "$($fg.Green)$($script:GitBranchIcon.Local)" : "$($fg.Blue)$($script:GitBranchIcon.Remote)"
+        $icon = $e.Local ? "$($fg.Green)$($icons.Local)" : "$($fg.Blue)$($icons.Remote)"
         $name = $e.Short.PadRight($nameWidth)
         $mark = $e.Current ? "$($fg.Green)*$($PSStyle.Reset)" : ' '
         "$i`t$($e.Ref)`t$icon$($PSStyle.Reset) $mark $name  $($fg.BrightBlack)$($e.Date.PadRight(14))  $($e.Subject)$($PSStyle.Reset)"
@@ -61,7 +65,7 @@ function Select-GitBranch {
         '--ansi', '--height=50%', '--layout=reverse', '--no-multi', '--info=inline-right'
         '--tiebreak=index'
         '--delimiter=\t', '--with-nth=3..'
-        '--prompt=switch> '
+        $plain ? '--prompt=switch (L local, R remote)> ' : '--prompt=switch> '
         '--preview=git log --oneline --graph --decorate -n 20 --color=always {2}'
         '--preview-window=right,50%'
         '--bind=ctrl-p:toggle-preview'

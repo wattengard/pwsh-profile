@@ -12,16 +12,36 @@
 #   PROMPT_GIT_STATE              1/0  show working tree state
 #   PROMPT_GIT_STATE_TIMEOUT_MS   how long to wait for git status
 #   PROMPT_TAB_TITLE              1/0  set the terminal tab title (path, or "repo (branch state)")
+#   PROFILE_ICONS                 nerd/plain  Nerd Font glyphs, or ASCII and standard arrows
 
-$script:GitIcon = @{
-    Branch     = [string][char]0xF418  # nf-oct-git_branch
-    Detached   = [string][char]0xF417  # nf-oct-git_commit
-    Staged     = [string][char]0xF00C  # nf-fa-check
-    Modified   = [string][char]0xF040  # nf-fa-pencil
-    Untracked  = [string][char]0xF128  # nf-fa-question
-    Conflicted = [string][char]0xF071  # nf-fa-warning
-    Ahead      = [string][char]0x21E1  # ⇡
-    Behind     = [string][char]0x21E3  # ⇣
+# Two icon sets, picked per prompt from PROFILE_ICONS so the toggle applies immediately:
+# 'nerd' (the default) uses Nerd Font glyphs, 'plain' sticks to ASCII and standard arrows for
+# terminals whose font has no Nerd Font glyphs.
+$script:GitIcons = @{
+    nerd  = @{
+        Branch     = [string][char]0xF418  # nf-oct-git_branch
+        Detached   = [string][char]0xF417  # nf-oct-git_commit
+        Staged     = [string][char]0xF00C  # nf-fa-check
+        Modified   = [string][char]0xF040  # nf-fa-pencil
+        Untracked  = [string][char]0xF128  # nf-fa-question
+        Conflicted = [string][char]0xF071  # nf-fa-warning
+        Ahead      = [string][char]0x21E1  # ⇡
+        Behind     = [string][char]0x21E3  # ⇣
+    }
+    plain = @{
+        Branch     = ''                    # the branch name stands on its own
+        Detached   = '@'
+        Staged     = '+'
+        Modified   = '!'
+        Untracked  = '?'
+        Conflicted = 'x'
+        Ahead      = [string][char]0x2191  # ↑
+        Behind     = [string][char]0x2193  # ↓
+    }
+}
+
+function script:Get-GitIcons {
+    $env:PROFILE_ICONS -eq 'plain' ? $script:GitIcons.plain : $script:GitIcons.nerd
 }
 
 # The subject only changes when HEAD moves, so remember the last one by SHA.
@@ -60,13 +80,13 @@ function script:Get-GitPromptInfo {
     if ($head.StartsWith('ref: ')) {
         $ref = $head.Substring(5)
         $name = $ref.StartsWith('refs/heads/') ? $ref.Substring(11) : $ref
-        $icon = $script:GitIcon.Branch
+        $icon = (Get-GitIcons).Branch
         $sha = Read-GitRef $commonDir $ref
     }
     else {
         $sha = $head
         $name = $head.Substring(0, [Math]::Min(7, $head.Length))
-        $icon = $script:GitIcon.Detached
+        $icon = (Get-GitIcons).Detached
     }
 
     $operation = if ([IO.Directory]::Exists("$gitDir/rebase-merge") -or [IO.Directory]::Exists("$gitDir/rebase-apply")) { 'rebase' }
@@ -296,13 +316,14 @@ function script:Format-GitState {
     param($Summary)
 
     $fg = $PSStyle.Foreground
+    $icon = Get-GitIcons
     $parts = @(
-        if ($Summary.Conflicted) { "$($fg.Red)$($script:GitIcon.Conflicted)$($Summary.Conflicted)" }
-        if ($Summary.Ahead) { "$($fg.Cyan)$($script:GitIcon.Ahead)$($Summary.Ahead)" }
-        if ($Summary.Behind) { "$($fg.Magenta)$($script:GitIcon.Behind)$($Summary.Behind)" }
-        if ($Summary.Staged) { "$($fg.Green)$($script:GitIcon.Staged)$($Summary.Staged)" }
-        if ($Summary.Modified) { "$($fg.Yellow)$($script:GitIcon.Modified)$($Summary.Modified)" }
-        if ($Summary.Untracked) { "$($fg.Blue)$($script:GitIcon.Untracked)$($Summary.Untracked)" }
+        if ($Summary.Conflicted) { "$($fg.Red)$($icon.Conflicted)$($Summary.Conflicted)" }
+        if ($Summary.Ahead) { "$($fg.Cyan)$($icon.Ahead)$($Summary.Ahead)" }
+        if ($Summary.Behind) { "$($fg.Magenta)$($icon.Behind)$($Summary.Behind)" }
+        if ($Summary.Staged) { "$($fg.Green)$($icon.Staged)$($Summary.Staged)" }
+        if ($Summary.Modified) { "$($fg.Yellow)$($icon.Modified)$($Summary.Modified)" }
+        if ($Summary.Untracked) { "$($fg.Blue)$($icon.Untracked)$($Summary.Untracked)" }
     )
     $parts -join ' '
 }
@@ -326,7 +347,7 @@ function prompt {
     if ($PWD.Provider.Name -eq 'FileSystem') {
         $info = Get-GitPromptInfo $path
         if ($info) {
-            $text = "$grey$($info.Icon) $($info.Name)"
+            $text = $info.Icon ? "$grey$($info.Icon) $($info.Name)" : "$grey$($info.Name)"
 
             if ($env:PROMPT_GIT_STATE -eq '1' -and $ProfileTools.git) {
                 $summary = Get-GitStatusSummary $info $path

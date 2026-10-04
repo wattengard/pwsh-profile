@@ -13,6 +13,9 @@ $defaults = [ordered]@{
     # How long the prompt waits for git status, in milliseconds, before showing the last known
     # state and letting git finish in the background.
     PROMPT_GIT_STATE_TIMEOUT_MS = '150'
+    # Icon style for the prompt, eza listings and the branch picker: 'nerd' uses Nerd Font glyphs,
+    # 'plain' uses ASCII and standard arrows (pick it if your terminal font is not a Nerd Font).
+    PROFILE_ICONS            = 'nerd'
     # Set the terminal tab title on every prompt: the prompt's path outside a git repo,
     # "repo (branch state)" inside one, e.g. "pwsh-profile (main ↑1 ✎ ?)" (1 = on, 0 = off).
     # The state part follows PROMPT_GIT_STATE.

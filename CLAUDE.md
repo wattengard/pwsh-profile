@@ -28,7 +28,7 @@ A highly opinionated PowerShell 7 profile for Windows, rc.d style. See [README.m
 - Fragments must not throw on load; bootstrap warns and continues, but a clean load is the goal.
 - **Fragments must be safe to load twice.** `. $PROFILE` re-runs everything in the same session, so anything that registers a hook or chains onto existing state must not stack on itself. Capture the original once (see the location-changed hook in `50_zoxide.ps1`).
 - **Startup cost matters.** Every fragment runs on each shell start. Avoid process spawns and `Get-Command` at load (a command it cannot find costs about 85 ms), prefer direct file checks, and time a fragment with `Measure-Command { . .\profile.d\<file> }` before adding it. Tool detection is about 40 ms for the whole registry, so stay in that league.
-- **Glyphs.** Terminal text (the prompt, fzf lists) may use Nerd Font glyphs. The terminal tab title uses the UI font, so it must stick to plain Unicode (`✓ ✎ ✕ ↑ ↓`).
+- **Glyphs.** Terminal text (the prompt, fzf lists, eza) may use Nerd Font glyphs, but only behind the `PROFILE_ICONS` toggle (`nerd` by default, `plain` for ASCII and standard arrows). Any new code that draws a Nerd Font glyph needs a `plain` alternative, picked at the point of use (per prompt or per call) so flipping the variable applies immediately; where it is baked into an environment variable at load (the `cdi` preview), say so. The terminal tab title uses the UI font, so it always sticks to plain Unicode (`✓ ✎ ✕ ↑ ↓`).
 - No oh-my-posh or starship; the prompt is hand-written.
 - Files are UTF-8.
 
