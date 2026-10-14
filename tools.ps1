@@ -24,6 +24,12 @@ $global:ProfileToolSpecs = @(
         Winget      = 'sharkdp.bat'
     }
     [ordered]@{
+        Name        = 'delta'
+        Description = 'syntax-highlighting pager for git diff, show and log'
+        Url         = 'https://github.com/dandavison/delta'
+        Winget      = 'dandavison.delta'
+    }
+    [ordered]@{
         Name        = 'eza'
         Description = 'modern replacement for ls with icons and git awareness'
         Url         = 'https://github.com/eza-community/eza'

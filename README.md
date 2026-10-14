@@ -87,10 +87,11 @@ The tools' own settings live in the repo under `.config\<tool>\`, and the matchi
 | bat | `.config\bat\config` | `BAT_CONFIG_PATH` |
 | eza | `.config\eza\` (`theme.yml`) | `EZA_CONFIG_DIR` |
 | fzf | `.config\fzf\fzfrc` | `FZF_DEFAULT_OPTS_FILE` |
+| git (delta) | `.config\git\delta`, only when delta is installed | an include entry added to `GIT_CONFIG_COUNT` |
 | micro | `.config\micro\` | `MICRO_CONFIG_HOME` |
 | yazi | `.config\yazi\` | `YAZI_CONFIG_HOME` |
 
-zoxide has no config file (it is set through `_ZO_*` variables in its fragment), and git, winget and file are left on their own system configs. Files a tool writes into its folder (micro's buffer history, yazi's state) are git-ignored. Sessions started before this change still hold the old values (for example `EZA_CONFIG_DIR`), so open a new terminal to pick up the repo configs.
+zoxide has no config file (it is set through `_ZO_*` variables in its fragment), and winget and file are left on their own system configs. Git keeps your own config entirely; only the delta settings are layered on top, and only when delta is installed. They are added as an include through `GIT_CONFIG_COUNT`, which supplements your config rather than replacing it, but for the few keys the file sets (`core.pager`, `interactive.diffFilter` and `delta.*`) it wins over yours. Files a tool writes into its folder (micro's buffer history, yazi's state) are git-ignored. Sessions started before this change still hold the old values (for example `EZA_CONFIG_DIR`), so open a new terminal to pick up the repo configs.
 
 ## Key bindings
 
@@ -119,6 +120,7 @@ Every tool is optional. A fragment that depends on one is skipped when it is not
 | [bat](https://github.com/sharkdp/bat) | A `cat` clone with syntax highlighting and git integration | `cat`, `type` |
 | [yazi](https://github.com/sxyazi/yazi) | A fast terminal file manager | `y`, which changes to yazi's last directory on quit |
 | [zoxide](https://github.com/ajeetdsouza/zoxide) | A smarter `cd` that learns the directories you use most | Replaces `cd` (`cd proj` jumps to the best match; real paths, `cd -` and `cd ..` work as usual) and adds `cdi` to pick from a list with fzf. Home and temp folders are never learned |
+| [delta](https://github.com/dandavison/delta) | A syntax-highlighting pager for git diffs | Git uses it for `git diff`, `show` and `log -p` when installed (see [Tool configs](#tool-configs)) |
 | [fzf](https://github.com/junegunn/fzf) | A command-line fuzzy finder | `Ctrl+R` history search, and picking a package in `wgs` |
 | [micro](https://micro-editor.github.io) | A modern terminal text editor with familiar key bindings | Its settings and bindings come from `.config\micro` |
 | [winget](https://github.com/microsoft/winget-cli) | The Windows package manager | `wgs <query>` searches and installs |
