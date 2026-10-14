@@ -5,4 +5,7 @@ config.local.ps1
 profile.d/*.local.ps1
 
 # State that tools write into their repo-local config folders
+.config/micro/*
+!.config/micro/bindings.json
+!.config/micro/settings.json
 .config/yazi/state/

@@ -84,10 +84,10 @@ Detection scans PATH for those two extensions, first match wins like the shell. 
 
 ## Tool configs
 
-A tool's own config lives in `.config/<tool>/` in the repo, never in the user's system location, so a clone gets the same setup. `profile.d/05_toolconfig.ps1` provides `Get-ProfileToolConfig '<path under .config>'`, which returns the full path or `$null` if it does not exist. The tool's fragment sets the tool's variable only when it is not already set and the path exists (`if (-not $env:X) { $p = Get-ProfileToolConfig ...; if ($p) { $env:X = $p } }`), so the environment still wins and a missing file degrades to the tool's defaults. Variables: bat `BAT_CONFIG_PATH`, eza `EZA_CONFIG_DIR`, fzf `FZF_DEFAULT_OPTS_FILE`, yazi `YAZI_CONFIG_HOME`.
+A tool's own config lives in `.config/<tool>/` in the repo, never in the user's system location, so a clone gets the same setup. `profile.d/05_toolconfig.ps1` provides `Get-ProfileToolConfig '<path under .config>'`, which returns the full path or `$null` if it does not exist. The tool's fragment sets the tool's variable only when it is not already set and the path exists (`if (-not $env:X) { $p = Get-ProfileToolConfig ...; if ($p) { $env:X = $p } }`), so the environment still wins and a missing file degrades to the tool's defaults. Variables: bat `BAT_CONFIG_PATH`, eza `EZA_CONFIG_DIR`, fzf `FZF_DEFAULT_OPTS_FILE`, micro `MICRO_CONFIG_HOME`, yazi `YAZI_CONFIG_HOME`.
 
 - **Excluded on purpose:** git (a global override would replace the user's identity), winget (fixed settings path, no override) and file (no config). zoxide has no config file, so it keeps its `_ZO_*` variables.
-- **State.** Tools can write into their config folder (yazi's state). Add those paths to `.gitignore` when integrating a tool, and never commit them.
+- **State.** Tools can write into their config folder (micro's buffers, yazi's state). Add those paths to `.gitignore` when integrating a tool, and never commit them.
 - **Existing system config.** When integrating a tool, copy the user's existing system config into `.config/<tool>/` after checking it for personal data (the repo is public).
 - **Stale shells.** Variables exported by an older profile load stay set in a running session and win over the repo path, so test in a clean environment (clear the variable first) or a new terminal.
 
@@ -101,7 +101,7 @@ Every feature (a single alias or a larger function) gets its own file `profile.d
 | --- | --- | --- |
 | `00-09` | Core shell setup, and shared helpers that other fragments build on | `00_prompt.ps1`, `05_toolconfig.ps1`, `05_widgets.ps1` |
 | `10-49` | Environment and shell behavior (PSReadLine, env vars, completions) | `10_psreadline.ps1` |
-| `50` | External tool integrations, one file per tool | `50_bat`, `50_eza`, `50_fzf`, `50_git`, `50_winget`, `50_yazi`, `50_zoxide` |
+| `50` | External tool integrations, one file per tool | `50_bat`, `50_eza`, `50_fzf`, `50_git`, `50_micro`, `50_winget`, `50_yazi`, `50_zoxide` |
 | `80` | Personal functions with no external dependency | `80_audit.ps1`, `80_config.ps1` |
 | `90-99` | Late overrides, machine-local tweaks (name machine-only ones `NN_name.local.ps1`, which git ignores) | |
 
