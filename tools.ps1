@@ -49,6 +49,12 @@ $global:ProfileToolSpecs = @(
         Winget      = 'Git.Git'
     }
     [ordered]@{
+        Name        = 'micro'
+        Description = 'modern terminal text editor with familiar key bindings'
+        Url         = 'https://micro-editor.github.io'
+        Winget      = 'zyedidia.micro'
+    }
+    [ordered]@{
         Name        = 'winget'
         Description = 'Windows package manager'
         Url         = 'https://github.com/microsoft/winget-cli'
