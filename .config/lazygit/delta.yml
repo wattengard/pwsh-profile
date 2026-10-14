@@ -1,0 +1,6 @@
+# Added to lazygit by profile.d/50_lazygit.ps1 only when delta is installed.
+# --paging=never because lazygit does the paging itself.
+git:
+  diffRenderers:
+    - type: stdinFilter
+      command: delta --dark --paging=never

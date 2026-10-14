@@ -55,6 +55,12 @@ $global:ProfileToolSpecs = @(
         Winget      = 'Git.Git'
     }
     [ordered]@{
+        Name        = 'lazygit'
+        Description = 'terminal UI for git'
+        Url         = 'https://github.com/jesseduffield/lazygit'
+        Winget      = 'JesseDuffield.lazygit'
+    }
+    [ordered]@{
         Name        = 'micro'
         Description = 'modern terminal text editor with familiar key bindings'
         Url         = 'https://micro-editor.github.io'

@@ -1,0 +1,2 @@
+# lazygit reads this through LG_CONFIG_FILE (profile.d/50_lazygit.ps1).
+# Add settings here; anything left out keeps its default.

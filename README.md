@@ -88,6 +88,7 @@ The tools' own settings live in the repo under `.config\<tool>\`, and the matchi
 | eza | `.config\eza\` (`theme.yml`) | `EZA_CONFIG_DIR` |
 | fzf | `.config\fzf\fzfrc` | `FZF_DEFAULT_OPTS_FILE` |
 | git (delta) | `.config\git\delta`, only when delta is installed | an include entry added to `GIT_CONFIG_COUNT` |
+| lazygit | `.config\lazygit\config.yml`, plus `delta.yml` when delta is installed | `LG_CONFIG_FILE` (comma-separated files) |
 | micro | `.config\micro\` | `MICRO_CONFIG_HOME` |
 | yazi | `.config\yazi\` | `YAZI_CONFIG_HOME` |
 
@@ -122,6 +123,7 @@ Every tool is optional. A fragment that depends on one is skipped when it is not
 | [zoxide](https://github.com/ajeetdsouza/zoxide) | A smarter `cd` that learns the directories you use most | Replaces `cd` (`cd proj` jumps to the best match; real paths, `cd -` and `cd ..` work as usual) and adds `cdi` to pick from a list with fzf. Home and temp folders are never learned |
 | [delta](https://github.com/dandavison/delta) | A syntax-highlighting pager for git diffs | Git uses it for `git diff`, `show` and `log -p` when installed (see [Tool configs](#tool-configs)) |
 | [fzf](https://github.com/junegunn/fzf) | A command-line fuzzy finder | `Ctrl+R` history search, and picking a package in `wgs` |
+| [lazygit](https://github.com/jesseduffield/lazygit) | A terminal UI for git | Its settings come from `.config\lazygit`, and diffs use delta when it is installed |
 | [micro](https://micro-editor.github.io) | A modern terminal text editor with familiar key bindings | Its settings and bindings come from `.config\micro` |
 | [winget](https://github.com/microsoft/winget-cli) | The Windows package manager | `wgs <query>` searches and installs |
 | [Git for Windows](https://gitforwindows.org) | Git and a bundled Unix toolset | `git status` for the prompt's working tree state, and its `file.exe` gives yazi mime-type detection |
