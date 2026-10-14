@@ -1,2 +1,19 @@
 # yazi reads this folder through YAZI_CONFIG_HOME (profile.d/50_yazi.ps1).
-# Add settings here; anything left out keeps its default.
+# Settings left out keep their default.
+
+# Open readable files (text, source code, markdown, config) in micro, in the terminal.
+# If micro is missing, say so instead of failing silently.
+[opener]
+micro = [
+	{ run = 'where micro >nul 2>&1 & if errorlevel 1 (echo micro is not installed & pause) else (micro %s)', desc = "micro", block = true },
+]
+
+[open]
+prepend_rules = [
+	{ mime = "text/*", use = [ "micro", "reveal" ] },
+	{ mime = "application/{json,ndjson,x-ndjson,javascript,xml,toml,yaml,x-yaml,x-sh,x-shellscript,x-wine-extension-ini,wine-extension-ini}", use = [ "micro", "reveal" ] },
+	{ mime = "*/xml", use = [ "micro", "reveal" ] },
+	{ mime = "inode/empty", use = [ "micro", "reveal" ] },
+	# file(1) does not always call these text, so match them by name as well.
+	{ url = "*.{ps1,psm1,psd1,md,toml,yaml,yml,json,jsonc,ini,conf,cfg,lua,txt,log}", use = [ "micro", "reveal" ] },
+]

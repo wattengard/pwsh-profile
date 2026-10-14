@@ -119,7 +119,7 @@ Every tool is optional. A fragment that depends on one is skipped when it is not
 | --- | --- | --- |
 | [eza](https://github.com/eza-community/eza) | A modern replacement for `ls` with icons and git awareness | `dir` |
 | [bat](https://github.com/sharkdp/bat) | A `cat` clone with syntax highlighting and git integration | `cat`, `type` |
-| [yazi](https://github.com/sxyazi/yazi) | A fast terminal file manager | `y`, which changes to yazi's last directory on quit |
+| [yazi](https://github.com/sxyazi/yazi) | A fast terminal file manager | `y`, which changes to yazi's last directory on quit. Text, source and config files open in micro, and `g` `l` opens the current folder in lazygit (both say so if the tool is missing) |
 | [zoxide](https://github.com/ajeetdsouza/zoxide) | A smarter `cd` that learns the directories you use most | Replaces `cd` (`cd proj` jumps to the best match; real paths, `cd -` and `cd ..` work as usual) and adds `cdi` to pick from a list with fzf. Home and temp folders are never learned |
 | [delta](https://github.com/dandavison/delta) | A syntax-highlighting pager for git diffs | Git uses it for `git diff`, `show` and `log -p` when installed (see [Tool configs](#tool-configs)) |
 | [fzf](https://github.com/junegunn/fzf) | A command-line fuzzy finder | `Ctrl+R` history search, and picking a package in `wgs` |

@@ -1,0 +1,7 @@
+# Added to yazi's default keymap; see yazi.toml for how the folder is found.
+
+[mgr]
+prepend_keymap = [
+	# g l: open the current folder in lazygit. If lazygit is missing, say so instead of failing silently.
+	{ on = [ "g", "l" ], run = "shell 'where lazygit >nul 2>&1 & if errorlevel 1 (echo lazygit is not installed & pause) else (lazygit)' --block", desc = "Open in lazygit" },
+]
