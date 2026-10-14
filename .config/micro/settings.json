@@ -1,0 +1,15 @@
+{
+    "colorscheme": "catppuccin-mocha",
+    "diffgutter": true,
+    "hlsearch": true,
+    "hltrailingws": true,
+    "mkparents": true,
+    "parsecursor": true,
+    "savecursor": true,
+    "saveundo": true,
+    "scrollbar": true,
+    "tabstospaces": true,
+    "truecolor": "on",
+    "ft:go": { "tabstospaces": false },
+    "ft:makefile": { "tabstospaces": false }
+}

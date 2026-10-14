@@ -8,4 +8,5 @@ profile.d/*.local.ps1
 .config/micro/*
 !.config/micro/bindings.json
 !.config/micro/settings.json
+!.config/micro/colorschemes/
 .config/yazi/state/

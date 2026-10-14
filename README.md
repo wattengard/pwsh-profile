@@ -128,11 +128,11 @@ Every tool is optional. A fragment that depends on one is skipped when it is not
 | [ripgrep](https://github.com/BurntSushi/ripgrep) | Fast recursive search that respects `.gitignore` | Its settings come from `.config\ripgrep`, it will not search under the users folder unless `PROFILE_RG_ALLOW_USERS` is on, and `rgf` (`Search-FileContent`) is a live grep: type to re-run `rg` in fzf, with a bat preview; Enter opens the match in micro at that line (needs fzf; without micro it returns the file and line) |
 | [fd](https://github.com/sharkdp/fd) | A fast, friendly `find` alternative | With fzf, plain `fzf` lists files through fd (hidden files included, `.git` and `.gitignore`d files left out) |
 | [lazygit](https://github.com/jesseduffield/lazygit) | A terminal UI for git | Its settings come from `.config\lazygit`, and diffs use delta when it is installed |
-| [micro](https://micro-editor.github.io) | A modern terminal text editor with familiar key bindings | Its settings and bindings come from `.config\micro` |
+| [micro](https://micro-editor.github.io) | A modern terminal text editor with familiar key bindings | Its settings, bindings and a Catppuccin Mocha color scheme come from `.config\micro` (`file:line:col` works on the command line) |
 | [winget](https://github.com/microsoft/winget-cli) | The Windows package manager | `wgs <query>` searches and installs |
 | [Git for Windows](https://gitforwindows.org) | Git and a bundled Unix toolset | `git status` for the prompt's working tree state, and its `file.exe` gives yazi mime-type detection |
 | [Nerd Fonts](https://www.nerdfonts.com) | Fonts patched with icon glyphs | Prompt branch icon and the icons in eza |
-| [Catppuccin](https://catppuccin.com) | A pastel color theme | Mocha theme for bat |
+| [Catppuccin](https://catppuccin.com) | A pastel color theme | Mocha theme for bat, fzf, ripgrep and micro |
 | [pure](https://github.com/sindresorhus/pure) | A minimal two-line zsh prompt | Inspiration for the prompt in `00_prompt.ps1` |
 
 ## License
