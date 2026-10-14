@@ -92,6 +92,7 @@ A tool's own config lives in `.config/<tool>/` in the repo, never in the user's 
 - **State.** Tools can write into their config folder (micro's buffers, yazi's state). Add those paths to `.gitignore` when integrating a tool, and never commit them.
 - **Existing system config.** When integrating a tool, copy the user's existing system config into `.config/<tool>/` after checking it for personal data (the repo is public).
 - **Stale shells.** Variables exported by an older profile load stay set in a running session and win over the repo path, so test in a clean environment (clear the variable first) or a new terminal.
+- **Static configs and optional tools.** A tool's config file cannot be gated on another tool being installed, unlike an environment variable set in a fragment. When a config references an optional tool (yazi's micro opener, its `g l` lazygit key), have the command check for it first (`where <tool> >nul 2>&1 & if errorlevel 1 (echo <tool> is not installed & pause) else (<tool> ...)`) so a missing tool gives a message instead of a silent failure. Yazi has no check-only mode and `ya env` hangs without a terminal, so a yazi config edit cannot be validated headlessly; say so when delivering one.
 
 ## Feature fragments
 
