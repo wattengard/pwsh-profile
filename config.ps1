@@ -32,6 +32,13 @@ $global:ProfileConfigSpecs = @(
         Description = "Icon style for the prompt, eza listings and the branch picker: 'nerd' uses Nerd Font glyphs, 'plain' uses ASCII and standard arrows (pick it if your terminal font is not a Nerd Font)."
     }
     [ordered]@{
+        Name        = 'PROFILE_RG_ALLOW_USERS'
+        Default     = '0'
+        Type        = 'bool'
+        Group       = 'General'
+        Description = 'Allow ripgrep (rg and rgf) to search inside the users folder. Off by default: reading every file under C:\Users makes OneDrive download all its synced files.'
+    }
+    [ordered]@{
         Name        = 'PROMPT_GIT_MESSAGE'
         Default     = '1'
         Type        = 'bool'

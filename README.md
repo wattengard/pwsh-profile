@@ -58,6 +58,7 @@ A setting that is back on its default is not written to the file, so `config.loc
 | `PROMPT_GIT_STATE` | `1` | Show working tree state after the branch: staged, modified, untracked, conflicts, ahead/behind (`0` to disable) |
 | `PROMPT_GIT_STATE_TIMEOUT_MS` | `150` | How long the prompt waits for `git status` before showing the last known state |
 | `PROFILE_ICONS` | `nerd` | Icon style: `nerd` uses Nerd Font glyphs in the prompt, `dir` (eza) and the `Ctrl+G` branch picker; `plain` uses ASCII and standard arrows, for terminals whose font is not a Nerd Font. It applies immediately; only the `cdi` preview reads it at load. yazi draws its own icons and is not affected |
+| `PROFILE_RG_ALLOW_USERS` | `0` | Let `rg` and `rgf` search inside the users folder (`C:\Users` and below). Off by default: ripgrep reads every file, and in OneDrive-synced folders that makes OneDrive download them all. While off, `rg` (an alias for `Invoke-Rg`) and `rgf` decline when the search path, or the current folder when none is given, is under the users folder; call `rg.exe` directly for a one-off. Applies immediately |
 | `PROMPT_TAB_TITLE` | `1` | Set the terminal tab title: the prompt's path outside a git repo, `repo (branch state)` inside one, e.g. `pwsh-profile (main ↑1 ✎ ?)` (`0` to disable). State uses plain Unicode (`✕` conflicts, `↑n`/`↓n` ahead/behind, `✓` staged, `✎` modified, `?` untracked) and follows `PROMPT_GIT_STATE` |
 
 The branch, in-progress operation and commit subject are read straight from `.git` without spawning git. The working tree state is the exception that proves the rule: it needs one `git status` per prompt, so it is time-capped, cached, and can be turned off.
@@ -90,9 +91,10 @@ The tools' own settings live in the repo under `.config\<tool>\`, and the matchi
 | git (delta) | `.config\git\delta`, only when delta is installed | an include entry added to `GIT_CONFIG_COUNT` |
 | lazygit | `.config\lazygit\config.yml`, plus `delta.yml` when delta is installed | `LG_CONFIG_FILE` (comma-separated files) |
 | micro | `.config\micro\` | `MICRO_CONFIG_HOME` |
+| ripgrep | `.config\ripgrep\ripgreprc` | `RIPGREP_CONFIG_PATH` |
 | yazi | `.config\yazi\` | `YAZI_CONFIG_HOME` |
 
-zoxide has no config file (it is set through `_ZO_*` variables in its fragment), and winget and file are left on their own system configs. Git keeps your own config entirely; only the delta settings are layered on top, and only when delta is installed. They are added as an include through `GIT_CONFIG_COUNT`, which supplements your config rather than replacing it, but for the few keys the file sets (`core.pager`, `interactive.diffFilter` and `delta.*`) it wins over yours. Files a tool writes into its folder (micro's buffer history, yazi's state) are git-ignored. Sessions started before this change still hold the old values (for example `EZA_CONFIG_DIR`), so open a new terminal to pick up the repo configs.
+zoxide has no config file (it is set through `_ZO_*` variables in its fragment), fd has none either (its options are in `profile.d/50_fd.ps1`), and winget and file are left on their own system configs. Git keeps your own config entirely; only the delta settings are layered on top, and only when delta is installed. They are added as an include through `GIT_CONFIG_COUNT`, which supplements your config rather than replacing it, but for the few keys the file sets (`core.pager`, `interactive.diffFilter` and `delta.*`) it wins over yours. Files a tool writes into its folder (micro's buffer history, yazi's state) are git-ignored. Sessions started before this change still hold the old values (for example `EZA_CONFIG_DIR`), so open a new terminal to pick up the repo configs.
 
 ## Key bindings
 
@@ -123,6 +125,8 @@ Every tool is optional. A fragment that depends on one is skipped when it is not
 | [zoxide](https://github.com/ajeetdsouza/zoxide) | A smarter `cd` that learns the directories you use most | Replaces `cd` (`cd proj` jumps to the best match; real paths, `cd -` and `cd ..` work as usual) and adds `cdi` to pick from a list with fzf. Home and temp folders are never learned |
 | [delta](https://github.com/dandavison/delta) | A syntax-highlighting pager for git diffs | Git uses it for `git diff`, `show` and `log -p` when installed (see [Tool configs](#tool-configs)) |
 | [fzf](https://github.com/junegunn/fzf) | A command-line fuzzy finder | `Ctrl+R` history search, and picking a package in `wgs` |
+| [ripgrep](https://github.com/BurntSushi/ripgrep) | Fast recursive search that respects `.gitignore` | Its settings come from `.config\ripgrep`, it will not search under the users folder unless `PROFILE_RG_ALLOW_USERS` is on, and `rgf` (`Search-FileContent`) is a live grep: type to re-run `rg` in fzf, with a bat preview; Enter opens the match in micro at that line (needs fzf; without micro it returns the file and line) |
+| [fd](https://github.com/sharkdp/fd) | A fast, friendly `find` alternative | With fzf, plain `fzf` lists files through fd (hidden files included, `.git` and `.gitignore`d files left out) |
 | [lazygit](https://github.com/jesseduffield/lazygit) | A terminal UI for git | Its settings come from `.config\lazygit`, and diffs use delta when it is installed |
 | [micro](https://micro-editor.github.io) | A modern terminal text editor with familiar key bindings | Its settings and bindings come from `.config\micro` |
 | [winget](https://github.com/microsoft/winget-cli) | The Windows package manager | `wgs <query>` searches and installs |

@@ -12,4 +12,5 @@
 
 #$env:PROFILE_ICONS = 'plain'                # nerd (default) or plain
 #$env:PROMPT_GIT_MESSAGE_WIDTH = '100'       # characters of the commit subject
-#$env:PROMPT_GIT_STATE = '0'                 # 1 = show working tree state, 0 = hide it
+#$env:PROFILE_RG_ALLOW_USERS = '1'          # 1 = let rg and rgf search under C:\Users (OneDrive may download files)
+#$env:PROMPT_GIT_STATE = '0'                # 1 = show working tree state, 0 = hide it

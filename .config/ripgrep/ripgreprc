@@ -1,0 +1,13 @@
+# rg reads this through RIPGREP_CONFIG_PATH (profile.d/50_rg.ps1). One argument per line.
+--smart-case
+--hidden
+--glob=!.git/
+--max-columns=300
+--max-columns-preview
+
+# Catppuccin Mocha
+--colors=path:fg:203,166,247
+--colors=line:fg:249,226,175
+--colors=column:fg:166,173,200
+--colors=match:fg:243,139,168
+--colors=match:style:bold

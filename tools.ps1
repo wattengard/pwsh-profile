@@ -36,6 +36,12 @@ $global:ProfileToolSpecs = @(
         Winget      = 'eza-community.eza'
     }
     [ordered]@{
+        Name        = 'fd'
+        Description = 'fast, friendly find alternative that respects .gitignore'
+        Url         = 'https://github.com/sharkdp/fd'
+        Winget      = 'sharkdp.fd'
+    }
+    [ordered]@{
         Name        = 'file'
         Description = 'file(1) mime-type detection, needed by yazi (the copy bundled with Git for Windows)'
         Url         = 'https://gitforwindows.org'
@@ -65,6 +71,12 @@ $global:ProfileToolSpecs = @(
         Description = 'modern terminal text editor with familiar key bindings'
         Url         = 'https://micro-editor.github.io'
         Winget      = 'zyedidia.micro'
+    }
+    [ordered]@{
+        Name        = 'rg'
+        Description = 'ripgrep: fast recursive search that respects .gitignore'
+        Url         = 'https://github.com/BurntSushi/ripgrep'
+        Winget      = 'BurntSushi.ripgrep.MSVC'
     }
     [ordered]@{
         Name        = 'winget'
