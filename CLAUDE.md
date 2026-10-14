@@ -5,6 +5,7 @@ A highly opinionated PowerShell 7 profile for Windows, rc.d style. See [README.m
 ## Working rules
 
 - **Never commit unless explicitly asked.** Make the change, describe it, and wait for the user to say to commit. The same goes for pushing and anything else outward-facing (creating or editing remote repos, releases, issues, pull requests). Approval for one commit does not carry over to the next.
+- **Stage new files immediately.** Right after creating a file, run `git add <file>` so its diff shows up in the Claude Code side panel. Staging is not committing: the commit rule above still applies. Check `.gitignore` first so a file that must stay local is not staged.
 - **Ask before installing software or changing global settings.** That covers `winget install`, `git config --global`, the registry, machine or user PATH, and anything else outside this repo and the session's scratch space. Say what and why, and wait for a yes. Repo-local changes are fine.
 - **This repo is public.** Never commit secrets, tokens, personal data, usernames or machine-specific absolute paths. Use `$PSScriptRoot`, `$env:USERPROFILE`, `$env:ProgramFiles` and the like.
 - **Commit identity.** Commits use the author email set in this repo's local git config, which must be a GitHub noreply address. Do not change it, do not override it per commit, and never use a personal email.
