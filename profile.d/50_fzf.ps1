@@ -1,9 +1,11 @@
 if (-not $ProfileTools.fzf) { return }
 
-# Catppuccin Mocha for every fzf window (including wgs), unless FZF_DEFAULT_OPTS is already set.
-if (-not $env:FZF_DEFAULT_OPTS) {
-    $env:FZF_DEFAULT_OPTS = '--color=fg:#cdd6f4,fg+:#cdd6f4,bg+:#313244,hl:#f38ba8,hl+:#f38ba8,' +
-        'info:#cba6f7,prompt:#cba6f7,pointer:#f5e0dc,marker:#b4befe,spinner:#f5e0dc,header:#f38ba8'
+# Catppuccin Mocha for every fzf window (including wgs), from the repo's .config\fzf\fzfrc,
+# unless FZF_DEFAULT_OPTS or FZF_DEFAULT_OPTS_FILE is already set.
+if (-not $env:FZF_DEFAULT_OPTS -and -not $env:FZF_DEFAULT_OPTS_FILE) {
+    $fzfConfig = Get-ProfileToolConfig 'fzf\fzfrc'
+    if ($fzfConfig) { $env:FZF_DEFAULT_OPTS_FILE = $fzfConfig }
+    Remove-Variable fzfConfig
 }
 
 function Select-HistoryWithFzf {

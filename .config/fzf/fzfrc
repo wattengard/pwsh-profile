@@ -1,0 +1,3 @@
+# fzf reads this through FZF_DEFAULT_OPTS_FILE (profile.d/50_fzf.ps1): Catppuccin Mocha.
+--color=fg:#cdd6f4,fg+:#cdd6f4,bg+:#313244,hl:#f38ba8,hl+:#f38ba8
+--color=info:#cba6f7,prompt:#cba6f7,pointer:#f5e0dc,marker:#b4befe,spinner:#f5e0dc,header:#f38ba8

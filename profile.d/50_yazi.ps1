@@ -1,5 +1,12 @@
 if (-not $ProfileTools.yazi) { return }
 
+# Settings come from the repo's .config\yazi, unless YAZI_CONFIG_HOME is already set.
+if (-not $env:YAZI_CONFIG_HOME) {
+    $yaziConfig = Get-ProfileToolConfig 'yazi'
+    if ($yaziConfig) { $env:YAZI_CONFIG_HOME = $yaziConfig }
+    Remove-Variable yaziConfig
+}
+
 # yazi needs file(1) for mime-type detection; the docs recommend the one bundled with Git for Windows.
 if (-not $env:YAZI_FILE_ONE -and $ProfileTools.file) {
     $env:YAZI_FILE_ONE = $ProfileTools.file

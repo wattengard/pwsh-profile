@@ -20,6 +20,7 @@ This backs up any existing `$PROFILE` to `$PROFILE.bak`, then overwrites it with
 | `config.local.ps1` | Your own overrides. Not in the repo (git ignores it), so `git pull` never touches it. Copy `config.local.ps1.example` to start |
 | `tools.ps1` | Registry of optional external tools (e.g. `eza`); detects them and records their paths |
 | `profile.d/` | Profile fragments, loaded in order (`00_prompt.ps1`, ...) |
+| `.config/` | The tools' own config files, one folder per tool (see [Tool configs](#tool-configs)) |
 
 ## Configuration
 
@@ -76,6 +77,19 @@ To support a new tool, add an entry to `$ProfileToolSpecs` in `tools.ps1`.
 ### Audit
 
 Run `audit` (`Invoke-ProfileAudit`) to see which tools were found. Each missing tool is listed with what it does, an install command and its project page. It reports what the current shell saw at startup, so open a new shell after installing. `audit -PassThru` also returns the results as objects.
+
+## Tool configs
+
+The tools' own settings live in the repo under `.config\<tool>\`, and the matching `50_*` fragment points the tool there through its environment variable, so a clone gets the same setup. A variable already set in your environment wins, so you can still override one.
+
+| Tool | Config | Variable |
+| --- | --- | --- |
+| bat | `.config\bat\config` | `BAT_CONFIG_PATH` |
+| eza | `.config\eza\` (`theme.yml`) | `EZA_CONFIG_DIR` |
+| fzf | `.config\fzf\fzfrc` | `FZF_DEFAULT_OPTS_FILE` |
+| yazi | `.config\yazi\` | `YAZI_CONFIG_HOME` |
+
+zoxide has no config file (it is set through `_ZO_*` variables in its fragment), and git, winget and file are left on their own system configs. Files a tool writes into its folder (yazi's state) are git-ignored. Sessions started before this change still hold the old values (for example `EZA_CONFIG_DIR`), so open a new terminal to pick up the repo configs.
 
 ## Key bindings
 

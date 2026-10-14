@@ -17,6 +17,7 @@ A highly opinionated PowerShell 7 profile for Windows, rc.d style. See [README.m
 - `bootstrap.ps1` dot-sources `config.ps1`, then `tools.ps1`, then every `profile.d\*.ps1` in name order. Keep it generic; put behavior in fragments.
 - `config.ps1` is the tracked registry of settings (see "Configuration" below). It also loads the user's `config.local.ps1`. Never put a user's own values in `config.ps1`.
 - `tools.ps1` is the registry of optional external tools. It detects them into `$ProfileTools` (name -> path or `$null`).
+- `.config/<tool>/` holds the tools' own config files, tracked in the repo. See "Tool configs" below.
 - `profile.d/NN_name.ps1` are the fragments. The numeric prefix controls load order.
 - `profile.d/80_audit.ps1` provides `Invoke-ProfileAudit` (`audit`), which reads the registry to report missing tools and install hints.
 - `profile.d/05_widgets.ps1` holds key-driven console widgets (`Read-ConsoleSelect`, `Read-ConsoleToggle`, `Read-ConsoleNumber`, `Read-ConsoleLine`) built from `[Console]::ReadKey` and ANSI escapes, no external tools. Use them for any new interactive screen instead of reaching for `Read-Host` or a GUI.
@@ -77,9 +78,18 @@ Detection scans PATH for those two extensions, first match wins like the shell. 
 **Checklist for a new tool integration:**
 
 1. Add the spec to `tools.ps1`.
-2. Write `profile.d/50_<tool>.ps1` following the layout below, with the guard.
+2. Write `profile.d/50_<tool>.ps1` following the layout below, with the guard. If the tool has a config file or folder, add it under `.config/<tool>/` and point the tool at it (see Tool configs).
 3. Add a row to the README "Tools used" table, any toggle to the README config table, and any key binding to the README "Key bindings" table.
 4. Test with the tool present and with it missing (see Testing).
+
+## Tool configs
+
+A tool's own config lives in `.config/<tool>/` in the repo, never in the user's system location, so a clone gets the same setup. `profile.d/05_toolconfig.ps1` provides `Get-ProfileToolConfig '<path under .config>'`, which returns the full path or `$null` if it does not exist. The tool's fragment sets the tool's variable only when it is not already set and the path exists (`if (-not $env:X) { $p = Get-ProfileToolConfig ...; if ($p) { $env:X = $p } }`), so the environment still wins and a missing file degrades to the tool's defaults. Variables: bat `BAT_CONFIG_PATH`, eza `EZA_CONFIG_DIR`, fzf `FZF_DEFAULT_OPTS_FILE`, yazi `YAZI_CONFIG_HOME`.
+
+- **Excluded on purpose:** git (a global override would replace the user's identity), winget (fixed settings path, no override) and file (no config). zoxide has no config file, so it keeps its `_ZO_*` variables.
+- **State.** Tools can write into their config folder (yazi's state). Add those paths to `.gitignore` when integrating a tool, and never commit them.
+- **Existing system config.** When integrating a tool, copy the user's existing system config into `.config/<tool>/` after checking it for personal data (the repo is public).
+- **Stale shells.** Variables exported by an older profile load stay set in a running session and win over the repo path, so test in a clean environment (clear the variable first) or a new terminal.
 
 ## Feature fragments
 
@@ -89,7 +99,7 @@ Every feature (a single alias or a larger function) gets its own file `profile.d
 
 | Range | Use | Example |
 | --- | --- | --- |
-| `00-09` | Core shell setup, and shared helpers that other fragments build on | `00_prompt.ps1`, `05_widgets.ps1` |
+| `00-09` | Core shell setup, and shared helpers that other fragments build on | `00_prompt.ps1`, `05_toolconfig.ps1`, `05_widgets.ps1` |
 | `10-49` | Environment and shell behavior (PSReadLine, env vars, completions) | `10_psreadline.ps1` |
 | `50` | External tool integrations, one file per tool | `50_bat`, `50_eza`, `50_fzf`, `50_git`, `50_winget`, `50_yazi`, `50_zoxide` |
 | `80` | Personal functions with no external dependency | `80_audit.ps1`, `80_config.ps1` |
@@ -100,7 +110,7 @@ Every feature (a single alias or a larger function) gets its own file `profile.d
 **File layout.** In this order:
 
 1. A guard that exits the fragment early if a required tool is missing: `if (-not $ProfileTools.<tool>) { return }`. Fragments are dot-sourced, so `return` only ends that file.
-2. Tool-specific environment variables (e.g. `EZA_CONFIG_DIR`), right after the guard.
+2. Tool-specific environment variables (e.g. `EZA_CONFIG_DIR`, set from `.config` as described in Tool configs), right after the guard.
 3. The function, named `Verb-Subject` with an approved verb (`Get-Verb`). Wrappers around an external program use `Invoke-`, e.g. `Invoke-Eza`. It passes `@args` through so callers can add flags. A comment-based help block sits inside the function so `Get-Help` works: `.SYNOPSIS`, `.DESCRIPTION`, and `.NOTES` with `Requires:` and `Aliases:` (or `Key:`) lines.
 4. If an alias shadows a built-in, remove the built-in first: `Remove-Alias <name> -Force -ErrorAction Ignore`. The exception is a tool whose own init script replaces the alias with `Set-Alias -Force` (zoxide's `cd`).
 5. `Set-Alias -Name <short> -Value <Verb-Subject>` to give the function its short name.

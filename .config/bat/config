@@ -1,0 +1,4 @@
+# bat reads this through BAT_CONFIG_PATH (profile.d/50_bat.ps1). One option per line.
+--style=numbers,changes,header
+--paging=never
+--theme="Catppuccin Mocha"

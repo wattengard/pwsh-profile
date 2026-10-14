@@ -1,0 +1,2 @@
+# yazi reads this folder through YAZI_CONFIG_HOME (profile.d/50_yazi.ps1).
+# Add settings here; anything left out keeps its default.

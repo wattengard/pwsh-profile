@@ -3,3 +3,6 @@
 # Machine-local files: never committed, never touched by git pull
 config.local.ps1
 profile.d/*.local.ps1
+
+# State that tools write into their repo-local config folders
+.config/yazi/state/

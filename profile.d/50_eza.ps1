@@ -1,6 +1,11 @@
 if (-not $ProfileTools.eza) { return }
 
-$env:EZA_CONFIG_DIR = Join-Path $env:USERPROFILE '.config\eza'
+# Theme comes from the repo's .config\eza (theme.yml), unless EZA_CONFIG_DIR is already set.
+if (-not $env:EZA_CONFIG_DIR) {
+    $ezaConfig = Get-ProfileToolConfig 'eza'
+    if ($ezaConfig) { $env:EZA_CONFIG_DIR = $ezaConfig }
+    Remove-Variable ezaConfig
+}
 
 function Invoke-Eza {
     <#
