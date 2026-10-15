@@ -58,6 +58,8 @@ A setting that is back on its default is not written to the file, so `config.loc
 | `PROMPT_GIT_STATE` | `1` | Show working tree state after the branch: staged, modified, untracked, conflicts, ahead/behind (`0` to disable) |
 | `PROMPT_GIT_STATE_TIMEOUT_MS` | `150` | How long the prompt waits for `git status` before showing the last known state |
 | `PROFILE_ICONS` | `nerd` | Icon style: `nerd` uses Nerd Font glyphs in the prompt, `dir` (eza) and the `Ctrl+G` branch picker; `plain` uses ASCII and standard arrows, for terminals whose font is not a Nerd Font. It applies immediately; only the `cdi` preview reads it at load. yazi draws its own icons and is not affected |
+| `PROFILE_TELLME_MODEL` | `sonnet` | Claude model `tellme` asks: `sonnet`, `haiku` (cheapest, but thinks more and is less terse) or `opus`. Applies immediately |
+| `PROFILE_TELLME_EFFORT` | `low` | Thinking effort `tellme` asks for: `low` (cheapest and fastest), `medium` or `high`. Raise it if answers carry reasoning or are wrong. Applies immediately |
 | `PROFILE_RG_ALLOW_USERS` | `0` | Let `rg` and `rgf` search inside the users folder (`C:\Users` and below). Off by default: ripgrep reads every file, and in OneDrive-synced folders that makes OneDrive download them all. While off, `rg` (an alias for `Invoke-Rg`) and `rgf` decline when the search path, or the current folder when none is given, is under the users folder; call `rg.exe` directly for a one-off. Applies immediately |
 | `PROMPT_TAB_TITLE` | `1` | Set the terminal tab title: the prompt's path outside a git repo, `repo (branch state)` inside one, e.g. `pwsh-profile (main ↑1 ✎ ?)` (`0` to disable). State uses plain Unicode (`✕` conflicts, `↑n`/`↓n` ahead/behind, `✓` staged, `✎` modified, `?` untracked) and follows `PROMPT_GIT_STATE` |
 
@@ -129,6 +131,7 @@ Every tool is optional. A fragment that depends on one is skipped when it is not
 | [fd](https://github.com/sharkdp/fd) | A fast, friendly `find` alternative | With fzf, plain `fzf` lists files through fd (hidden files included, `.git` and `.gitignore`d files left out) |
 | [lazygit](https://github.com/jesseduffield/lazygit) | A terminal UI for git | Its settings come from `.config\lazygit`, and diffs use delta when it is installed |
 | [micro](https://micro-editor.github.io) | A modern terminal text editor with familiar key bindings | Its settings, bindings and a Catppuccin Mocha color scheme come from `.config\micro` (`file:line:col` works on the command line) |
+| [Claude Code](https://claude.com/claude-code) | Anthropic's coding agent | `tellme <question>` asks Claude for a terse, copy-ready answer (no quotes needed, e.g. `tellme how to list running containers in podman`). It runs `claude -p` on Sonnet by default (`PROFILE_TELLME_MODEL`) with tools, MCP servers, skills and session history switched off |
 | [winget](https://github.com/microsoft/winget-cli) | The Windows package manager | `wgs <query>` searches and installs |
 | [Git for Windows](https://gitforwindows.org) | Git and a bundled Unix toolset | `git status` for the prompt's working tree state, and its `file.exe` gives yazi mime-type detection |
 | [Nerd Fonts](https://www.nerdfonts.com) | Fonts patched with icon glyphs | Prompt branch icon and the icons in eza |

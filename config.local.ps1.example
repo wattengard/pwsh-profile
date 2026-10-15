@@ -13,4 +13,6 @@
 #$env:PROFILE_ICONS = 'plain'                # nerd (default) or plain
 #$env:PROMPT_GIT_MESSAGE_WIDTH = '100'       # characters of the commit subject
 #$env:PROFILE_RG_ALLOW_USERS = '1'          # 1 = let rg and rgf search under C:\Users (OneDrive may download files)
+#$env:PROFILE_TELLME_MODEL = 'haiku'         # sonnet (default), haiku or opus: the model tellme asks
+#$env:PROFILE_TELLME_EFFORT = 'medium'      # low (default), medium or high: how hard tellme thinks
 #$env:PROMPT_GIT_STATE = '0'                # 1 = show working tree state, 0 = hide it

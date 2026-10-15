@@ -24,6 +24,12 @@ $global:ProfileToolSpecs = @(
         Winget      = 'sharkdp.bat'
     }
     [ordered]@{
+        Name        = 'claude'
+        Description = 'Claude Code, Anthropic''s coding agent; tellme uses it for one-shot answers'
+        Url         = 'https://claude.com/claude-code'
+        Winget      = 'Anthropic.ClaudeCode'
+    }
+    [ordered]@{
         Name        = 'delta'
         Description = 'syntax-highlighting pager for git diff, show and log'
         Url         = 'https://github.com/dandavison/delta'

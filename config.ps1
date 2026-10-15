@@ -39,6 +39,22 @@ $global:ProfileConfigSpecs = @(
         Description = 'Allow ripgrep (rg and rgf) to search inside the users folder. Off by default: reading every file under C:\Users makes OneDrive download all its synced files.'
     }
     [ordered]@{
+        Name        = 'PROFILE_TELLME_MODEL'
+        Default     = 'sonnet'
+        Type        = 'choice'
+        Values      = @('haiku', 'sonnet', 'opus')
+        Group       = 'General'
+        Description = "Claude model that tellme asks: 'haiku' is the cheapest, 'sonnet' is the default (about a tenth of a cent more per call, but faster and more reliably terse), 'opus' is the most capable and costs the most."
+    }
+    [ordered]@{
+        Name        = 'PROFILE_TELLME_EFFORT'
+        Default     = 'low'
+        Type        = 'choice'
+        Values      = @('low', 'medium', 'high')
+        Group       = 'General'
+        Description = "Thinking effort tellme asks Claude to use: 'low' is the cheapest and fastest; raise it if answers come back with reasoning in them or get things wrong."
+    }
+    [ordered]@{
         Name        = 'PROMPT_GIT_MESSAGE'
         Default     = '1'
         Type        = 'bool'
