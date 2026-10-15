@@ -18,9 +18,29 @@ This backs up any existing `$PROFILE` to `$PROFILE.bak`, then overwrites it with
 | `bootstrap.ps1` | Dot-sources `config.ps1`, `tools.ps1`, then every `profile.d\*.ps1` in name order |
 | `config.ps1` | Every setting with its default, type and allowed values; also applies your local overrides |
 | `config.local.ps1` | Your own overrides. Not in the repo (git ignores it), so `git pull` never touches it. Copy `config.local.ps1.example` to start |
-| `tools.ps1` | Registry of optional external tools (e.g. `eza`); detects them and records their paths |
+| `tools.ps1` | Registry of optional external tools (eza, fzf, ...); detects them and records their paths |
 | `profile.d/` | Profile fragments, loaded in order (`00_prompt.ps1`, ...) |
 | `.config/` | The tools' own config files, one folder per tool (see [Tool configs](#tool-configs)) |
+| `CLAUDE.md` | Working rules and conventions for contributors and Claude Code (fragment layout, testing, commit style) |
+
+## Commands
+
+What the profile adds to the shell. Each one needs the tool in the second column and is skipped without it (see [Optional tools](#optional-tools)).
+
+| Command | Needs | What it does |
+| --- | --- | --- |
+| `dir` | eza | Compact long listing with icons |
+| `cat`, `type` | bat | Syntax-highlighted file view |
+| `cd`, `cdi` | zoxide | `cd` jumps to the best match for a partial name; `cdi` picks from a list (needs fzf) |
+| `y` | yazi | File manager that changes to its last directory on quit |
+| `rg` | ripgrep | Search, but declines inside the users folder (see [ripgrep](#ripgrep)) |
+| `rgf` | ripgrep, fzf | Live grep: type to re-run `rg`, Enter opens the match in micro |
+| `wgs <query>` | winget, fzf | Search winget packages and install the one you pick |
+| `tellme <question>` | claude | Terse one-shot answer from Claude (see [tellme](#tellme)) |
+| `cfg` | | Interactive settings screen (see [Changing settings from the shell](#changing-settings-from-the-shell)) |
+| `audit` | | Report missing optional tools with install hints (see [Audit](#audit)) |
+
+Key bindings are listed under [Key bindings](#key-bindings).
 
 ## Configuration
 
@@ -57,12 +77,11 @@ A setting that is back on its default is not written to the file, so `config.loc
 | `PROMPT_GIT_MESSAGE_WIDTH` | `72` | Max characters of the subject before it is cut with `…`. It is also cut to fit next to the path and branch, and left out when fewer than 12 characters would fit |
 | `PROMPT_GIT_STATE` | `1` | Show working tree state after the branch: staged, modified, untracked, conflicts, ahead/behind (`0` to disable) |
 | `PROMPT_GIT_STATE_TIMEOUT_MS` | `150` | How long the prompt waits for `git status` before showing the last known state |
+| `PROMPT_TAB_TITLE` | `1` | Set the terminal tab title: the prompt's path outside a git repo, `repo (branch state)` inside one, e.g. `pwsh-profile (main ↑1 ✎ ?)` (`0` to disable). State uses plain Unicode (`✕` conflicts, `↑n`/`↓n` ahead/behind, `✓` staged, `✎` modified, `?` untracked) and follows `PROMPT_GIT_STATE` |
 | `PROFILE_ICONS` | `nerd` | Icon style: `nerd` uses Nerd Font glyphs in the prompt, `dir` (eza) and the `Ctrl+G` branch picker; `plain` uses ASCII and standard arrows, for terminals whose font is not a Nerd Font. It applies immediately; only the `cdi` preview reads it at load. yazi draws its own icons and is not affected |
+| `PROFILE_RG_ALLOW_USERS` | `0` | Let `rg` and `rgf` search inside the users folder (`C:\Users` and below). Off by default, see [ripgrep](#ripgrep). Applies immediately |
 | `PROFILE_TELLME_MODEL` | `sonnet` | Claude model `tellme` asks: `sonnet`, `haiku` (cheapest, but thinks more and is less terse) or `opus`. Applies immediately |
 | `PROFILE_TELLME_EFFORT` | `low` | Thinking effort `tellme` asks for: `low` (cheapest and fastest), `medium` or `high`. Raise it if answers carry reasoning or are wrong. Applies immediately |
-| `PROFILE_RG_ALLOW_USERS` | `0` | Let `rg` and `rgf` search inside the users folder (`C:\Users` and below). Off by default: ripgrep reads every file, and in OneDrive-synced folders that makes OneDrive download them all. While off, `rg` (an alias for `Invoke-Rg`) and `rgf` decline when the search path, or the current folder when none is given, is under the users folder; call `rg.exe` directly for a one-off. Applies immediately |
-| `PROMPT_TAB_TITLE` | `1` | Set the terminal tab title: the prompt's path outside a git repo, `repo (branch state)` inside one, e.g. `pwsh-profile (main ↑1 ✎ ?)` (`0` to disable). State uses plain Unicode (`✕` conflicts, `↑n`/`↓n` ahead/behind, `✓` staged, `✎` modified, `?` untracked) and follows `PROMPT_GIT_STATE` |
-
 The branch, in-progress operation and commit subject are read straight from `.git` without spawning git. The working tree state is the exception that proves the rule: it needs one `git status` per prompt, so it is time-capped, cached, and can be turned off.
 
 ## Optional tools
@@ -96,7 +115,7 @@ The tools' own settings live in the repo under `.config\<tool>\`, and the matchi
 | ripgrep | `.config\ripgrep\ripgreprc` | `RIPGREP_CONFIG_PATH` |
 | yazi | `.config\yazi\` | `YAZI_CONFIG_HOME` |
 
-zoxide has no config file (it is set through `_ZO_*` variables in its fragment), fd has none either (its options are in `profile.d/50_fd.ps1`), and winget and file are left on their own system configs. Git keeps your own config entirely; only the delta settings are layered on top, and only when delta is installed. They are added as an include through `GIT_CONFIG_COUNT`, which supplements your config rather than replacing it, but for the few keys the file sets (`core.pager`, `interactive.diffFilter` and `delta.*`) it wins over yours. Files a tool writes into its folder (micro's buffer history, yazi's state) are git-ignored. Sessions started before this change still hold the old values (for example `EZA_CONFIG_DIR`), so open a new terminal to pick up the repo configs.
+zoxide has no config file (it is set through `_ZO_*` variables in its fragment), fd has none either (its options are in `profile.d/50_fd.ps1`), claude is configured through the `PROFILE_TELLME_*` settings, and winget and file are left on their own system configs. Git keeps your own config entirely; only the delta settings are layered on top, and only when delta is installed. They are added as an include through `GIT_CONFIG_COUNT`, which supplements your config rather than replacing it, but for the few keys the file sets (`core.pager`, `interactive.diffFilter` and `delta.*`) it wins over yours. Files a tool writes into its folder (micro's buffer history, yazi's state) are git-ignored. A shell that was already running when a tool config changed may still hold the old variables, so open a new terminal to pick up the repo configs.
 
 ## Key bindings
 
@@ -115,29 +134,42 @@ Predictions from history show inline as gray text (`Right Arrow` accepts). Lines
 
 Drop a `NN_name.ps1` file in `profile.d/`. Lower numbers load first. A fragment that throws produces a warning and the rest still load.
 
+For a tool integration, also add the tool to `tools.ps1`, guard the fragment with `if (-not $ProfileTools.<tool>) { return }`, and add rows to the tables here. [CLAUDE.md](CLAUDE.md) has the full conventions: numbering, file layout, naming, load-twice safety and how to test.
+
 ## Tools used
 
 Every tool is optional. A fragment that depends on one is skipped when it is not installed (see [Optional tools](#optional-tools)).
 
 | Tool | What it does | Used for |
 | --- | --- | --- |
-| [eza](https://github.com/eza-community/eza) | A modern replacement for `ls` with icons and git awareness | `dir` |
 | [bat](https://github.com/sharkdp/bat) | A `cat` clone with syntax highlighting and git integration | `cat`, `type` |
-| [yazi](https://github.com/sxyazi/yazi) | A fast terminal file manager | `y`, which changes to yazi's last directory on quit. Text, source and config files open in micro, and `g` `l` opens the current folder in lazygit (both say so if the tool is missing) |
-| [zoxide](https://github.com/ajeetdsouza/zoxide) | A smarter `cd` that learns the directories you use most | Replaces `cd` (`cd proj` jumps to the best match; real paths, `cd -` and `cd ..` work as usual) and adds `cdi` to pick from a list with fzf. Home and temp folders are never learned |
+| [Catppuccin](https://catppuccin.com) | A pastel color theme | Mocha theme for bat, fzf, ripgrep and micro |
+| [Claude Code](https://claude.com/claude-code) | Anthropic's coding agent | `tellme` (see [tellme](#tellme)) |
 | [delta](https://github.com/dandavison/delta) | A syntax-highlighting pager for git diffs | Git uses it for `git diff`, `show` and `log -p` when installed (see [Tool configs](#tool-configs)) |
-| [fzf](https://github.com/junegunn/fzf) | A command-line fuzzy finder | `Ctrl+R` history search, and picking a package in `wgs` |
-| [ripgrep](https://github.com/BurntSushi/ripgrep) | Fast recursive search that respects `.gitignore` | Its settings come from `.config\ripgrep`, it will not search under the users folder unless `PROFILE_RG_ALLOW_USERS` is on, and `rgf` (`Search-FileContent`) is a live grep: type to re-run `rg` in fzf, with a bat preview; Enter opens the match in micro at that line (needs fzf; without micro it returns the file and line) |
+| [eza](https://github.com/eza-community/eza) | A modern replacement for `ls` with icons and git awareness | `dir` |
 | [fd](https://github.com/sharkdp/fd) | A fast, friendly `find` alternative | With fzf, plain `fzf` lists files through fd (hidden files included, `.git` and `.gitignore`d files left out) |
+| [fzf](https://github.com/junegunn/fzf) | A command-line fuzzy finder | `Ctrl+R` history search, the `Ctrl+G` branch picker, and picking a package in `wgs` |
+| [Git for Windows](https://gitforwindows.org) | Git and a bundled Unix toolset | `git status` for the prompt's working tree state, and its `file.exe` gives yazi mime-type detection |
 | [lazygit](https://github.com/jesseduffield/lazygit) | A terminal UI for git | Its settings come from `.config\lazygit`, and diffs use delta when it is installed |
 | [micro](https://micro-editor.github.io) | A modern terminal text editor with familiar key bindings | Its settings, bindings and a Catppuccin Mocha color scheme come from `.config\micro` (`file:line:col` works on the command line) |
-| [Claude Code](https://claude.com/claude-code) | Anthropic's coding agent | `tellme <question>` asks Claude for a terse, copy-ready answer (no quotes needed, e.g. `tellme how to list running containers in podman`). It runs `claude -p` on Sonnet by default (`PROFILE_TELLME_MODEL`) with tools, MCP servers, skills and session history switched off |
-| [winget](https://github.com/microsoft/winget-cli) | The Windows package manager | `wgs <query>` searches and installs |
-| [Git for Windows](https://gitforwindows.org) | Git and a bundled Unix toolset | `git status` for the prompt's working tree state, and its `file.exe` gives yazi mime-type detection |
 | [Nerd Fonts](https://www.nerdfonts.com) | Fonts patched with icon glyphs | Prompt branch icon and the icons in eza |
-| [Catppuccin](https://catppuccin.com) | A pastel color theme | Mocha theme for bat, fzf, ripgrep and micro |
 | [pure](https://github.com/sindresorhus/pure) | A minimal two-line zsh prompt | Inspiration for the prompt in `00_prompt.ps1` |
+| [ripgrep](https://github.com/BurntSushi/ripgrep) | Fast recursive search that respects `.gitignore` | `rg` and `rgf` (see [ripgrep](#ripgrep)) |
+| [winget](https://github.com/microsoft/winget-cli) | The Windows package manager | `wgs <query>` searches and installs |
+| [yazi](https://github.com/sxyazi/yazi) | A fast terminal file manager | `y`. Text, source and config files open in micro, and `g` `l` opens the current folder in lazygit (both say so if the tool is missing) |
+| [zoxide](https://github.com/ajeetdsouza/zoxide) | A smarter `cd` that learns the directories you use most | Replaces `cd` (real paths, `cd -` and `cd ..` work as usual) and adds `cdi`. Home and temp folders are never learned |
 
+### ripgrep
+
+Its settings come from `.config\ripgrep`. `rg` is an alias for `Invoke-Rg`, which declines to search when the search path, or the current folder when none is given, is under the users folder (`C:\Users` and below). Searching there reads every file, and in OneDrive-synced folders that makes OneDrive download them all. Set `PROFILE_RG_ALLOW_USERS` to `1` to allow it, or call `rg.exe` directly for a one-off.
+
+`rgf` (`Search-FileContent`) is a live grep: type to re-run `rg` in fzf, with a bat preview. Enter opens the match in micro at that line. It needs fzf; without micro it returns the file and line.
+
+### tellme
+
+`tellme how to list running containers in podman` asks Claude and prints a terse, copy-ready answer: commands in one code block, no reasoning or extras. The words after `tellme` are the question, no quotes needed.
+
+It runs `claude -p` with tools, MCP servers, skills and session history switched off, so it is a plain one-shot question. The model and thinking effort come from `PROFILE_TELLME_MODEL` (`sonnet` by default) and `PROFILE_TELLME_EFFORT` (`low`). It runs from the temp folder, because Claude Code loads the working folder's `CLAUDE.md` and project context as input, which made each call about ten times more expensive inside a big repo.
 ## License
 
 [MIT](LICENSE)
