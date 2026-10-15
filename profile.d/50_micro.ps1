@@ -7,3 +7,8 @@ if (-not $env:MICRO_CONFIG_HOME) {
     if ($microConfig) { $env:MICRO_CONFIG_HOME = $microConfig }
     Remove-Variable microConfig
 }
+
+# Make micro the editor for git commit messages and other tools that read EDITOR, unless it is
+# already set (audit warns when it points elsewhere). The bare name, not the full path, because
+# some tools split EDITOR on spaces.
+if (-not $env:EDITOR) { $env:EDITOR = 'micro' }

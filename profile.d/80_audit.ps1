@@ -6,6 +6,7 @@ function Invoke-ProfileAudit {
         Reads the tool registry in tools.ps1 and the lookup results from startup. Each missing
         tool is listed with what it does, an install command, and its project page. The report
         reflects what this shell saw when it started, so open a new shell after installing.
+        It also warns when micro is installed but EDITOR is set to something else.
     .PARAMETER PassThru
         Also return one object per tool (Name, Found, Path, Description, Install, Url).
     .NOTES
@@ -52,6 +53,12 @@ function Invoke-ProfileAudit {
     }
     else {
         Write-Host ''
+    }
+
+    # Settings the profile cannot make for you: warn, and leave the change to the user.
+    if ($global:ProfileTools.micro -and $env:EDITOR -notmatch '(?i)(^|[\\/\s"''])micro(\.exe|\.cmd)?("|\s|$)') {
+        $current = if ($env:EDITOR) { "'$env:EDITOR'" } else { 'not set' }
+        Write-Warning "micro is installed but is not your default editor (EDITOR is $current). Set it with: [Environment]::SetEnvironmentVariable('EDITOR', 'micro', 'User')"
     }
 
     if ($PassThru) { $results }

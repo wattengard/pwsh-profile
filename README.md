@@ -98,7 +98,7 @@ To support a new tool, add an entry to `$ProfileToolSpecs` in `tools.ps1`.
 
 ### Audit
 
-Run `audit` (`Invoke-ProfileAudit`) to see which tools were found. Each missing tool is listed with what it does, an install command and its project page. It reports what the current shell saw at startup, so open a new shell after installing. `audit -PassThru` also returns the results as objects.
+Run `audit` (`Invoke-ProfileAudit`) to see which tools were found. Each missing tool is listed with what it does, an install command and its project page. It reports what the current shell saw at startup, so open a new shell after installing. `audit -PassThru` also returns the results as objects. It also warns when micro is installed but `EDITOR` is set to something else, with the command to change it permanently (the profile never changes your saved environment variables for you).
 
 ## Tool configs
 
@@ -151,7 +151,7 @@ Every tool is optional. A fragment that depends on one is skipped when it is not
 | [fzf](https://github.com/junegunn/fzf) | A command-line fuzzy finder | `Ctrl+R` history search, the `Ctrl+G` branch picker, and picking a package in `wgs` |
 | [Git for Windows](https://gitforwindows.org) | Git and a bundled Unix toolset | `git status` for the prompt's working tree state, and its `file.exe` gives yazi mime-type detection |
 | [lazygit](https://github.com/jesseduffield/lazygit) | A terminal UI for git | Its settings come from `.config\lazygit`, and diffs use delta when it is installed |
-| [micro](https://micro-editor.github.io) | A modern terminal text editor with familiar key bindings | Its settings, bindings and a Catppuccin Mocha color scheme come from `.config\micro` (`file:line:col` works on the command line) |
+| [micro](https://micro-editor.github.io) | A modern terminal text editor with familiar key bindings | Sets `EDITOR` to `micro` when it is not already set. Its settings, bindings and a Catppuccin Mocha color scheme come from `.config\micro` (`file:line:col` works on the command line) |
 | [Nerd Fonts](https://www.nerdfonts.com) | Fonts patched with icon glyphs | Prompt branch icon and the icons in eza |
 | [pure](https://github.com/sindresorhus/pure) | A minimal two-line zsh prompt | Inspiration for the prompt in `00_prompt.ps1` |
 | [ripgrep](https://github.com/BurntSushi/ripgrep) | Fast recursive search that respects `.gitignore` | `rg` and `rgf` (see [ripgrep](#ripgrep)) |
