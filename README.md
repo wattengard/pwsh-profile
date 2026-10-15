@@ -21,6 +21,7 @@ This backs up any existing `$PROFILE` to `$PROFILE.bak`, then overwrites it with
 | `tools.ps1` | Registry of optional external tools (eza, fzf, ...); detects them and records their paths |
 | `profile.d/` | Profile fragments, loaded in order (`00_prompt.ps1`, ...) |
 | `.config/` | The tools' own config files, one folder per tool (see [Tool configs](#tool-configs)) |
+| `bin/` | Scripts that run outside the profile, such as the `EDITOR` launcher `micro-edit.ps1` |
 | `CLAUDE.md` | Working rules and conventions for contributors and Claude Code (fragment layout, testing, commit style) |
 
 ## Commands
@@ -33,6 +34,7 @@ What the profile adds to the shell. Each one needs the tool in the second column
 | `cat`, `type` | bat | Syntax-highlighted file view |
 | `cd`, `cdi` | zoxide | `cd` jumps to the best match for a partial name; `cdi` picks from a list (needs fzf) |
 | `y` | yazi | File manager that changes to its last directory on quit |
+| `micro` | micro | Opens in its own terminal window when run inside Claude Code (where micro stops responding), and waits for it to close; plain micro everywhere else. Call `micro.exe` to skip the wrapper. `EDITOR` gets the same treatment through `bin\micro-edit.ps1`, which is what makes Ctrl+G in Claude Code work |
 | `rg` | ripgrep | Search, but declines inside the users folder (see [ripgrep](#ripgrep)) |
 | `rgf` | ripgrep, fzf | Live grep: type to re-run `rg`, Enter opens the match in micro |
 | `wgs <query>` | winget, fzf | Search winget packages and install the one you pick |
@@ -151,7 +153,7 @@ Every tool is optional. A fragment that depends on one is skipped when it is not
 | [fzf](https://github.com/junegunn/fzf) | A command-line fuzzy finder | `Ctrl+R` history search, the `Ctrl+G` branch picker, and picking a package in `wgs` |
 | [Git for Windows](https://gitforwindows.org) | Git and a bundled Unix toolset | `git status` for the prompt's working tree state, and its `file.exe` gives yazi mime-type detection |
 | [lazygit](https://github.com/jesseduffield/lazygit) | A terminal UI for git | Its settings come from `.config\lazygit`, and diffs use delta when it is installed |
-| [micro](https://micro-editor.github.io) | A modern terminal text editor with familiar key bindings | Sets `EDITOR` to `micro` when it is not already set. Its settings, bindings and a Catppuccin Mocha color scheme come from `.config\micro` (`file:line:col` works on the command line) |
+| [micro](https://micro-editor.github.io) | A modern terminal text editor with familiar key bindings | Sets `EDITOR` to the `bin\micro-edit.ps1` launcher when it is not already set, and `micro` is a wrapper that opens its own window inside Claude Code. Its settings, bindings and a Catppuccin Mocha color scheme come from `.config\micro` (`file:line:col` works on the command line) |
 | [Nerd Fonts](https://www.nerdfonts.com) | Fonts patched with icon glyphs | Prompt branch icon and the icons in eza |
 | [pure](https://github.com/sindresorhus/pure) | A minimal two-line zsh prompt | Inspiration for the prompt in `00_prompt.ps1` |
 | [ripgrep](https://github.com/BurntSushi/ripgrep) | Fast recursive search that respects `.gitignore` | `rg` and `rgf` (see [ripgrep](#ripgrep)) |

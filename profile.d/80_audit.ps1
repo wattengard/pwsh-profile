@@ -56,7 +56,7 @@ function Invoke-ProfileAudit {
     }
 
     # Settings the profile cannot make for you: warn, and leave the change to the user.
-    if ($global:ProfileTools.micro -and $env:EDITOR -notmatch '(?i)(^|[\\/\s"''])micro(\.exe|\.cmd)?("|\s|$)') {
+    if ($global:ProfileTools.micro -and $env:EDITOR -notmatch '(?i)(^|[\\/\s"''])micro(-edit\.ps1|\.exe|\.cmd)?("|\s|$)') {
         $current = if ($env:EDITOR) { "'$env:EDITOR'" } else { 'not set' }
         Write-Warning "micro is installed but is not your default editor (EDITOR is $current). Set it with: [Environment]::SetEnvironmentVariable('EDITOR', 'micro', 'User')"
     }
