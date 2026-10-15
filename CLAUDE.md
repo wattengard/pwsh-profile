@@ -104,7 +104,7 @@ Every feature (a single alias or a larger function) gets its own file `profile.d
 | --- | --- | --- |
 | `00-09` | Core shell setup, and shared helpers that other fragments build on | `00_prompt.ps1`, `05_toolconfig.ps1`, `05_widgets.ps1` |
 | `10-49` | Environment and shell behavior (PSReadLine, env vars, completions) | `10_psreadline.ps1` |
-| `50` | External tool integrations, one file per tool | `50_bat`, `50_delta`, `50_eza`, `50_fd`, `50_fzf`, `50_git`, `50_lazygit`, `50_micro`, `50_rg`, `50_winget`, `50_yazi`, `50_zoxide` |
+| `50` | External tool integrations, one file per tool | `50_bat`, `50_claude`, `50_delta`, `50_eza`, `50_fd`, `50_fzf`, `50_git`, `50_lazygit`, `50_micro`, `50_rg`, `50_winget`, `50_yazi`, `50_zoxide` |
 | `80` | Personal functions with no external dependency | `80_audit.ps1`, `80_config.ps1` |
 | `90-99` | Late overrides, machine-local tweaks (name machine-only ones `NN_name.local.ps1`, which git ignores) | |
 
