@@ -20,7 +20,7 @@ A highly opinionated PowerShell 7 profile for Windows, rc.d style. See [README.m
 - `tools.ps1` is the registry of optional external tools. It detects them into `$ProfileTools` (name -> path or `$null`).
 - `.config/<tool>/` holds the tools' own config files, tracked in the repo. See "Tool configs" below.
 - `profile.d/NN_name.ps1` are the fragments. The numeric prefix controls load order.
-- `profile.d/80_audit.ps1` provides `Invoke-ProfileAudit` (`audit`), which reads the registry to report missing tools and install hints.
+- `profile.d/80_audit.ps1` provides `Invoke-ProfileAudit` (`audit`), which reads the registry to report missing tools and install hints, and warns about environment settings the profile will not change for the user (micro installed but `EDITOR` pointing elsewhere). A new check of that kind goes there, with a suggested command rather than an automatic change.
 - `profile.d/05_widgets.ps1` holds key-driven console widgets (`Read-ConsoleSelect`, `Read-ConsoleToggle`, `Read-ConsoleNumber`, `Read-ConsoleLine`) built from `[Console]::ReadKey` and ANSI escapes, no external tools. Use them for any new interactive screen instead of reaching for `Read-Host` or a GUI.
 - `profile.d/80_config.ps1` provides `Get-ProfileConfig`, `Set-ProfileConfig` and `Edit-ProfileConfig` (`cfg`) for reading and changing settings.
 
