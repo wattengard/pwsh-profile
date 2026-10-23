@@ -39,6 +39,7 @@ What the profile adds to the shell. Each one needs the tool in the second column
 | `rgf` | ripgrep, fzf | Live grep: type to re-run `rg`, Enter opens the match in micro |
 | `wgs <query>` | winget, fzf | Search winget packages and install the one you pick |
 | `tellme <question>` | claude | Terse one-shot answer from Claude (see [tellme](#tellme)) |
+| `cpath <file>` | | Copy the full path of a file or folder to the clipboard |
 | `cfg` | | Interactive settings screen (see [Changing settings from the shell](#changing-settings-from-the-shell)) |
 | `audit` | | Report missing optional tools with install hints (see [Audit](#audit)) |
 
