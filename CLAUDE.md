@@ -64,6 +64,8 @@ Settings are environment variables. `config.ps1` registers each one in `$global:
 
 Any alias, function or other behavior that depends on an external tool must be guarded with `if ($ProfileTools.<tool>)` so the profile degrades cleanly when the tool is not installed. A fragment that needs several tools guards on all of them (`$ProfileTools.git -and $ProfileTools.fzf`).
 
+**Exception: the container runtime.** docker and podman are deliberately not in `tools.ps1`, because `audit` would report whichever one the user does not use as missing. `50_dockerhub.ps1` guards on fzf only, takes the runtime from `PROFILE_CONTAINER_RUNTIME`, names it in the command it prepares, and checks for it with `Get-Command` only at the moment `dhs --run` would start it (a warning, not an error, when it is missing). Do not copy this for a tool that can simply be registered.
+
 Register a tool by adding a spec to `$ProfileToolSpecs` in `tools.ps1`:
 
 | Field | Meaning |
@@ -105,7 +107,7 @@ Every feature (a single alias or a larger function) gets its own file `profile.d
 | --- | --- | --- |
 | `00-09` | Core shell setup, and shared helpers that other fragments build on | `00_prompt.ps1`, `05_toolconfig.ps1`, `05_widgets.ps1` |
 | `10-49` | Environment and shell behavior (PSReadLine, env vars, completions) | `10_psreadline.ps1` |
-| `50` | External tool integrations, one file per tool | `50_bat`, `50_claude`, `50_delta`, `50_eza`, `50_fd`, `50_fzf`, `50_git`, `50_lazygit`, `50_micro`, `50_rg`, `50_winget`, `50_yazi`, `50_zoxide` |
+| `50` | External tool integrations, one file per tool (`50_dockerhub` is the exception: it needs only fzf and a web API) | `50_bat`, `50_claude`, `50_delta`, `50_dockerhub`, `50_eza`, `50_fd`, `50_fzf`, `50_git`, `50_lazygit`, `50_micro`, `50_rg`, `50_winget`, `50_yazi`, `50_zoxide` |
 | `80` | Personal functions with no external dependency | `80_audit.ps1`, `80_config.ps1` |
 | `90-99` | Late overrides, machine-local tweaks (name machine-only ones `NN_name.local.ps1`, which git ignores) | |
 
@@ -129,7 +131,7 @@ When opening a file at a position in micro, use `micro <file> +<line>:<col>`. Th
 
 In a double-quoted string, `"$script:Name:"` reads the trailing colon as part of a drive-qualified variable name and expands to nothing. Write `"${script:Name}:"`.
 
-**Key-binding fragments.** Anything that has to put text on the command line (the Ctrl+R history picker, the Ctrl+G branch picker) is a PSReadLine key handler, not a typed command: a command runs after Enter, when the line is already gone, so only a handler can edit it. The pattern is a `Verb-Subject` function that returns the text, plus `Set-PSReadLineKeyHandler` that calls it, runs `InvokePrompt()` to redraw after fzf, and inserts the result without running it. Pick a chord that is unbound by default (check with `Get-PSReadLineKeyHandler -Bound`). When fzf rows need a hidden field, prefix each row with an index and a tab and use `--delimiter '\t' --with-nth`, and return only the ASCII index so non-ASCII and multi-line text come back intact.
+**Key-binding fragments.** Anything that has to put text on the command line (the Ctrl+R history picker, the Ctrl+G branch picker, the Ctrl+D Docker Hub picker) is a PSReadLine key handler, not a typed command: a command runs after Enter, when the line is already gone, so only a handler can edit it. The pattern is a `Verb-Subject` function that returns the text, plus `Set-PSReadLineKeyHandler` that calls it, runs `InvokePrompt()` to redraw after fzf, and inserts the result without running it. A handler that takes its input from the line (Ctrl+D searches for what is typed) reads it with `GetBufferState` and swaps it for the result with `Replace(0, $line.Length, $text)` instead of inserting. Pick a chord that is unbound by default (check with `Get-PSReadLineKeyHandler -Bound`). When fzf rows need a hidden field, prefix each row with an index and a tab and use `--delimiter '\t' --with-nth`, and return only the ASCII index so non-ASCII and multi-line text come back intact.
 
 ```powershell
 # profile.d/50_eza.ps1
