@@ -10,7 +10,8 @@
 # an interactive settings screen and `Set-ProfileConfig NAME VALUE` changes one setting. Both read
 # and write exactly these lines and leave everything else, comments and other code, as it is.
 
-#$env:PROFILE_ICONS = 'plain'                # nerd (default) or plain
+#$env:PROFILE_CONTAINER_RUNTIME = 'podman'  # docker (default) or podman: the runtime Ctrl+D / dhs put in the run command
+#$env:PROFILE_ICONS = 'plain'               # nerd (default) or plain
 #$env:PROMPT_GIT_MESSAGE_WIDTH = '100'       # characters of the commit subject
 #$env:PROFILE_RG_ALLOW_USERS = '1'          # 1 = let rg and rgf search under C:\Users (OneDrive may download files)
 #$env:PROFILE_TELLME_MODEL = 'haiku'         # sonnet (default), haiku or opus: the model tellme asks

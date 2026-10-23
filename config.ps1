@@ -24,6 +24,14 @@
 
 $global:ProfileConfigSpecs = @(
     [ordered]@{
+        Name        = 'PROFILE_CONTAINER_RUNTIME'
+        Default     = 'docker'
+        Type        = 'choice'
+        Values      = @('docker', 'podman')
+        Group       = 'General'
+        Description = "Container runtime named in the command the Docker Hub picker (Ctrl+D, dhs) prepares: 'docker' or 'podman'. Podman gets fully qualified image names (docker.io/library/nginx)."
+    }
+    [ordered]@{
         Name        = 'PROFILE_ICONS'
         Default     = 'nerd'
         Type        = 'choice'
