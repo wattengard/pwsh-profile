@@ -28,7 +28,10 @@ if ((Test-Path $profilePath) -and (Get-Item $profilePath).Length -gt 0) {
     }
 }
 
-$content = ". '$($bootstrap -replace "'", "''")'"
+# $PROFILE may be shared between machines (OneDrive), so the line has to cope with the repo being
+# absent on this one: warn and carry on with a plain shell instead of failing on every start.
+$quoted = "'$($bootstrap -replace "'", "''")'"
+$content = "if (Test-Path -LiteralPath $quoted) { . $quoted } else { Write-Warning ('pwsh-profile is not installed on this machine, expected at ' + $quoted + '. Clone the repo there and run install.ps1.') }"
 if ($PSCmdlet.ShouldProcess($profilePath, 'Overwrite with bootstrap pointer')) {
     Set-Content -Path $profilePath -Value $content -Encoding utf8NoBOM
     Write-Host "Profile $profilePath now points to $bootstrap"

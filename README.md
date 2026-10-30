@@ -10,6 +10,8 @@ pwsh -File .\install.ps1
 
 This backs up any existing `$PROFILE` to `$PROFILE.bak`, then overwrites it with a single line that dot-sources `bootstrap.ps1` from this repo. Use `-WhatIf` to preview.
 
+The line checks that `bootstrap.ps1` exists first. If `$PROFILE` is shared between machines (for example through OneDrive) and the repo is not cloned at that path on this one, you get a warning and a plain PowerShell instead of an error. Clone the repo to the same path (or run `install.ps1` from where you cloned it) to enable the profile there. Note that running `install.ps1` rewrites the shared file with that machine's path.
+
 ## Layout
 
 | Path | Purpose |

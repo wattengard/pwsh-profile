@@ -14,7 +14,7 @@ A highly opinionated PowerShell 7 profile for Windows, rc.d style. See [README.m
 
 ## Structure
 
-- `install.ps1` points `$PROFILE` at `bootstrap.ps1`. It backs up the old profile and overwrites it. Supports `-WhatIf`.
+- `install.ps1` points `$PROFILE` at `bootstrap.ps1`. It backs up the old profile and overwrites it. Supports `-WhatIf`. The line it writes is guarded with `Test-Path` and warns instead of failing when the repo is missing, because `$PROFILE` can be shared between machines (OneDrive) where the repo is not cloned. That check cannot live in `bootstrap.ps1`, which is never reached when it is absent.
 - `bootstrap.ps1` dot-sources `config.ps1`, then `tools.ps1`, then every `profile.d\*.ps1` in name order. Keep it generic; put behavior in fragments.
 - `config.ps1` is the tracked registry of settings (see "Configuration" below). It also loads the user's `config.local.ps1`. Never put a user's own values in `config.ps1`.
 - `tools.ps1` is the registry of optional external tools. It detects them into `$ProfileTools` (name -> path or `$null`).
