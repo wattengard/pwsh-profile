@@ -44,6 +44,7 @@ What the profile adds to the shell. Each one needs the tool in the second column
 | `tellme <question>` | claude | Terse one-shot answer from Claude (see [tellme](#tellme)) |
 | `cpath <file>` | | Copy the full path of a file or folder to the clipboard |
 | `cfg` | | Interactive settings screen (see [Changing settings from the shell](#changing-settings-from-the-shell)) |
+| `banner` | | Show the startup banner (PowerShell logo and system info) |
 | `audit` | | Report missing optional tools with install hints (see [Audit](#audit)) |
 
 Key bindings are listed under [Key bindings](#key-bindings).
@@ -84,6 +85,7 @@ A setting that is back on its default is not written to the file, so `config.loc
 | `PROMPT_GIT_STATE` | `1` | Show working tree state after the branch: staged, modified, untracked, conflicts, ahead/behind (`0` to disable) |
 | `PROMPT_GIT_STATE_TIMEOUT_MS` | `150` | How long the prompt waits for `git status` before showing the last known state |
 | `PROMPT_TAB_TITLE` | `1` | Set the terminal tab title: the prompt's path outside a git repo, `repo (branch state)` inside one, e.g. `pwsh-profile (main ↑1 ✎ ?)` (`0` to disable). State uses plain Unicode (`✕` conflicts, `↑n`/`↓n` ahead/behind, `✓` staged, `✎` modified, `?` untracked) and follows `PROMPT_GIT_STATE` |
+| `PROFILE_BANNER` | `1` | Show the PowerShell logo with user, PowerShell and OS versions, uptime and current directory when an interactive shell starts (`0` to disable). Needs a truecolor terminal; the glyphs follow `PROFILE_ICONS`. `banner` shows it on demand either way |
 | `PROFILE_CONTAINER_RUNTIME` | `docker` | Runtime named in the command the Docker Hub picker prepares (`Ctrl+D`, `dhs`): `docker` or `podman`. Podman gets fully qualified image names (`docker.io/library/nginx`), since it does not assume Docker Hub for short names. Applies immediately |
 | `PROFILE_ICONS` | `nerd` | Icon style: `nerd` uses Nerd Font glyphs in the prompt, `dir` (eza) and the `Ctrl+G` branch picker; `plain` uses ASCII and standard arrows, for terminals whose font is not a Nerd Font. It applies immediately; only the `cdi` preview reads it at load. yazi draws its own icons and is not affected |
 | `PROFILE_RG_ALLOW_USERS` | `0` | Let `rg` and `rgf` search inside the users folder (`C:\Users` and below). Off by default, see [ripgrep](#ripgrep). Applies immediately |

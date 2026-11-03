@@ -24,6 +24,13 @@
 
 $global:ProfileConfigSpecs = @(
     [ordered]@{
+        Name        = 'PROFILE_BANNER'
+        Default     = '1'
+        Type        = 'bool'
+        Group       = 'General'
+        Description = 'Show the PowerShell logo with system info when an interactive shell starts. The banner command shows it on demand either way.'
+    }
+    [ordered]@{
         Name        = 'PROFILE_CONTAINER_RUNTIME'
         Default     = 'docker'
         Type        = 'choice'
