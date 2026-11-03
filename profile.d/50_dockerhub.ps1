@@ -21,8 +21,6 @@ function Search-DockerHub {
         it runs the command instead and returns nothing. The runtime is
         PROFILE_CONTAINER_RUNTIME ('docker' or 'podman'). Podman gets a fully qualified name
         (docker.io/library/nginx) because it does not assume Docker Hub for short names.
-        Bound to Ctrl+D, which searches for the text already on the command line (or asks for a
-        query if the line is empty) and replaces the line with the command for you to review.
         The query may be several words without quotes.
     .EXAMPLE
         dhs nginx
@@ -31,7 +29,6 @@ function Search-DockerHub {
     .NOTES
         Requires: fzf (docker or podman only to run an image; without --run it is only named in the command)
         Aliases: dhs
-        Key: Ctrl+D
     #>
     param(
         [Parameter(Mandatory, Position = 0, ValueFromRemainingArguments)]
@@ -83,27 +80,6 @@ function Search-DockerHub {
         return
     }
     & $runtime @arguments
-}
-
-# Ctrl+D: search Docker Hub for the text on the line (asking for one if the line is empty) and
-# replace the line with the run command, without running it. Like Ctrl+G this has to be a key
-# handler, because only a handler can edit the line being typed.
-Set-PSReadLineKeyHandler -Chord Ctrl+d -BriefDescription 'FzfDockerHubRun' `
-    -Description 'Search Docker Hub with fzf and prepare the run command' -ScriptBlock {
-    $line = $null
-    $cursor = $null
-    [Microsoft.PowerShell.PSConsoleReadLine]::GetBufferState([ref]$line, [ref]$cursor)
-
-    $query = $line.Trim()
-    if (-not $query) {
-        $query = (Read-ConsoleLine -Prompt 'search Docker Hub: ' -Transient)
-        if ($query) { $query = $query.Trim() }
-    }
-    $command = $query ? (Search-DockerHub $query) : $null
-
-    # fzf drew over the screen; redraw the prompt, then swap the line for the command.
-    [Microsoft.PowerShell.PSConsoleReadLine]::InvokePrompt()
-    if ($command) { [Microsoft.PowerShell.PSConsoleReadLine]::Replace(0, $line.Length, $command) }
 }
 
 Set-Alias -Name dhs -Value Search-DockerHub

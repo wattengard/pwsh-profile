@@ -40,7 +40,7 @@ What the profile adds to the shell. Each one needs the tool in the second column
 | `rg` | ripgrep | Search, but declines inside the users folder (see [ripgrep](#ripgrep)) |
 | `rgf` | ripgrep, fzf | Live grep: type to re-run `rg`, Enter opens the match in micro |
 | `wgs <query>` | winget, fzf | Search winget packages and install the one you pick |
-| `dhs <query>` | fzf | Search Docker Hub, pick an image and get its `docker run` (or `podman run`, see `PROFILE_CONTAINER_RUNTIME`) command printed, not run. `dhs --run <query>` runs the picked image instead. `Ctrl+D` does the same from the command line and puts the command on the line |
+| `dhs <query>` | fzf | Search Docker Hub, pick an image and get its `docker run` (or `podman run`, see `PROFILE_CONTAINER_RUNTIME`) command printed, not run. `dhs --run <query>` runs the picked image instead |
 | `tellme <question>` | claude | Terse one-shot answer from Claude (see [tellme](#tellme)) |
 | `cpath <file>` | | Copy the full path of a file or folder to the clipboard |
 | `cfg` | | Interactive settings screen (see [Changing settings from the shell](#changing-settings-from-the-shell)) |
@@ -86,7 +86,7 @@ A setting that is back on its default is not written to the file, so `config.loc
 | `PROMPT_GIT_STATE_TIMEOUT_MS` | `150` | How long the prompt waits for `git status` before showing the last known state |
 | `PROMPT_TAB_TITLE` | `1` | Set the terminal tab title: the prompt's path outside a git repo, `repo (branch state)` inside one, e.g. `pwsh-profile (main ↑1 ✎ ?)` (`0` to disable). State uses plain Unicode (`✕` conflicts, `↑n`/`↓n` ahead/behind, `✓` staged, `✎` modified, `?` untracked) and follows `PROMPT_GIT_STATE` |
 | `PROFILE_BANNER` | `1` | Show the PowerShell logo with user, PowerShell and OS versions, uptime and current directory when an interactive shell starts (`0` to disable). Needs a truecolor terminal; the glyphs follow `PROFILE_ICONS`. `banner` shows it on demand either way |
-| `PROFILE_CONTAINER_RUNTIME` | `docker` | Runtime named in the command the Docker Hub picker prepares (`Ctrl+D`, `dhs`): `docker` or `podman`. Podman gets fully qualified image names (`docker.io/library/nginx`), since it does not assume Docker Hub for short names. Applies immediately |
+| `PROFILE_CONTAINER_RUNTIME` | `docker` | Runtime named in the command the Docker Hub picker (`dhs`) prepares: `docker` or `podman`. Podman gets fully qualified image names (`docker.io/library/nginx`), since it does not assume Docker Hub for short names. Applies immediately |
 | `PROFILE_ICONS` | `nerd` | Icon style: `nerd` uses Nerd Font glyphs in the prompt, `dir` (eza) and the `Ctrl+G` branch picker; `plain` uses ASCII and standard arrows, for terminals whose font is not a Nerd Font. It applies immediately; only the `cdi` preview reads it at load. yazi draws its own icons and is not affected |
 | `PROFILE_RG_ALLOW_USERS` | `0` | Let `rg` and `rgf` search inside the users folder (`C:\Users` and below). Off by default, see [ripgrep](#ripgrep). Applies immediately |
 | `PROFILE_TELLME_MODEL` | `sonnet` | Claude model `tellme` asks: `sonnet`, `haiku` (cheapest, but thinks more and is less terse) or `opus`. Applies immediately |
@@ -136,7 +136,6 @@ Set up in `profile.d/10_psreadline.ps1` (PSReadLine), `profile.d/50_fzf.ps1`, `p
 | `Tab` | Navigable completion menu |
 | `Ctrl+R` | Search history with fzf (needs fzf); `Ctrl+R` again inside fzf toggles between recency and match order. The chosen command is placed on the command line, not run |
 | `Ctrl+G` | Pick a git branch with fzf (needs git and fzf) and put `git switch ...` on the command line, without running it. Local branches show a desktop icon, remote ones a globe; `Ctrl+P` toggles a log preview. A remote branch with no local copy gives `git switch --track origin/<name>`. Remote branches are as of your last fetch |
-| `Ctrl+D` | Search Docker Hub (needs fzf) for the text on the line, or ask for a query if the line is empty, and replace the line with `docker run --rm -it <image>` without running it. `PROFILE_CONTAINER_RUNTIME=podman` gives `podman run` with a fully qualified image name |
 
 Predictions from history show inline as gray text (`Right Arrow` accepts). Lines that look like they contain secrets (password, token, API key, ...) are kept out of the history file. The PSReadLine part only applies in an interactive console.
 
