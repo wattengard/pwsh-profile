@@ -88,10 +88,18 @@ A setting that is back on its default is not written to the file, so `config.loc
 | `PROFILE_BANNER` | `1` | Show the PowerShell logo with user, PowerShell and OS versions, uptime and current directory when an interactive shell starts (`0` to disable). Needs a truecolor terminal; the glyphs follow `PROFILE_ICONS`. `banner` shows it on demand either way |
 | `PROFILE_CONTAINER_RUNTIME` | `docker` | Runtime named in the command the Docker Hub picker (`dhs`) prepares: `docker` or `podman`. Podman gets fully qualified image names (`docker.io/library/nginx`), since it does not assume Docker Hub for short names. Applies immediately |
 | `PROFILE_ICONS` | `nerd` | Icon style: `nerd` uses Nerd Font glyphs in the prompt, `dir` (eza) and the `Ctrl+G` branch picker; `plain` uses ASCII and standard arrows, for terminals whose font is not a Nerd Font. It applies immediately; only the `cdi` preview reads it at load. yazi draws its own icons and is not affected |
+| `PROFILE_UPDATE_CHECK` | `1` | Check in the background whether the profile is behind `main` on GitHub (only when it runs from a git clone) and show a clock icon in the prompt when it is, see [Update check](#update-check) (`0` to disable). Read when the shell starts |
+| `PROFILE_UPDATE_CHECK_HOURS` | `12` | Minimum hours between update checks. Read when the shell starts |
 | `PROFILE_RG_ALLOW_USERS` | `0` | Let `rg` and `rgf` search inside the users folder (`C:\Users` and below). Off by default, see [ripgrep](#ripgrep). Applies immediately |
 | `PROFILE_TELLME_MODEL` | `sonnet` | Claude model `tellme` asks: `sonnet`, `haiku` (cheapest, but thinks more and is less terse) or `opus`. Applies immediately |
 | `PROFILE_TELLME_EFFORT` | `low` | Thinking effort `tellme` asks for: `low` (cheapest and fastest), `medium` or `high`. Raise it if answers carry reasoning or are wrong. Applies immediately |
 The branch, in-progress operation and commit subject are read straight from `.git` without spawning git. The working tree state is the exception that proves the rule: it needs one `git status` per prompt, so it is time-capped, cached, and can be turned off.
+
+### Update check
+
+When the profile runs from a git clone, a shell start that is due for a check (at most every `PROFILE_UPDATE_CHECK_HOURS`) starts one hidden `git fetch` of `main` plus a count of the commits you are missing. It is fire and forget: it never prompts for credentials, ssh gives up after 10 seconds, and a check that has not finished when the shell closes is simply lost. The prompt collects the result and, when you are behind, adds a clock icon and the number of missing commits after the branch (`update:3` with `PROFILE_ICONS=plain`). The count is also in `$ProfileUpdateBehind` (0 when up to date or unknown). Update with `git pull` in the clone, then open a new shell (or `. $PROFILE`); the icon goes away on its own, since a saved count only counts for the commit it was measured on.
+
+The last check and its result are remembered in `.git\pwsh-profile-update`, so a new terminal shows the icon without checking again. The fetch moves your `origin/main` ref, like running `git fetch`. Being ahead of `main` (local commits) is not "behind".
 
 ## Optional tools
 

@@ -27,6 +27,7 @@ $script:GitIcons = @{
         Conflicted = [string][char]0xF071  # nf-fa-warning
         Ahead      = [string][char]0x21E1  # ⇡
         Behind     = [string][char]0x21E3  # ⇣
+        Update     = [string][char]0xF017  # nf-fa-clock_o
     }
     plain = @{
         Branch     = ''                    # the branch name stands on its own
@@ -37,6 +38,7 @@ $script:GitIcons = @{
         Conflicted = 'x'
         Ahead      = [string][char]0x2191  # ↑
         Behind     = [string][char]0x2193  # ↓
+        Update     = 'update:'
     }
 }
 
@@ -339,6 +341,11 @@ function prompt {
     $path = $PWD.ProviderPath
     $display = $path.StartsWith($HOME, [StringComparison]::OrdinalIgnoreCase) ? '~' + $path.Substring($HOME.Length) : $path
 
+    # Collect a finished background update check (50_update.ps1; absent if that fragment is gone
+    # or git is missing), then mark the line when this profile is behind main: "<clock>3".
+    if (${function:Update-ProfileUpdateState}) { Update-ProfileUpdateState }
+    $update = $global:ProfileUpdateBehind -gt 0 ? " $($PSStyle.Foreground.Yellow)$((Get-GitIcons).Update)$global:ProfileUpdateBehind" : ''
+
     $grey = $PSStyle.Foreground.BrightBlack
     $git = ''
     $right = ''
@@ -369,7 +376,7 @@ function prompt {
                         # Right-align: never overlap the left part (2 column gap), and keep the
                         # last column free so the terminal does not wrap. If there is too little
                         # room for a useful message, leave it out rather than crowd the path.
-                        $leftLength = ("$display$git" -replace "$([char]27)\[[0-9;]*m", '').Length
+                        $leftLength = ("$display$git$update" -replace "$([char]27)\[[0-9;]*m", '').Length
                         $limit = [Math]::Min($limit, $columns - 1 - $leftLength - 2)
                         if ($limit -ge 12) {
                             if ($subject.Length -gt $limit) { $subject = $subject.Substring(0, $limit - 1) + '…' }
@@ -393,5 +400,5 @@ function prompt {
 
     $caretColor = $succeeded ? $PSStyle.Foreground.Magenta : $PSStyle.Foreground.Red
 
-    "`n$($PSStyle.Foreground.Blue)$display$git$right$($PSStyle.Reset)`n$caretColor❯$($PSStyle.Reset) "
+    "`n$($PSStyle.Foreground.Blue)$display$git$update$right$($PSStyle.Reset)`n$caretColor❯$($PSStyle.Reset) "
 }

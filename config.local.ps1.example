@@ -10,6 +10,7 @@
 # an interactive settings screen and `Set-ProfileConfig NAME VALUE` changes one setting. Both read
 # and write exactly these lines and leave everything else, comments and other code, as it is.
 
+#$env:PROFILE_UPDATE_CHECK = '0'            # 1 (default) = check GitHub in the background for a newer profile, 0 = never
 #$env:PROFILE_BANNER = '0'                  # 1 (default) = show the startup banner, 0 = hide it
 #$env:PROFILE_CONTAINER_RUNTIME = 'podman'  # docker (default) or podman: the runtime dhs puts in the run command
 #$env:PROFILE_ICONS = 'plain'               # nerd (default) or plain

@@ -39,6 +39,22 @@ $global:ProfileConfigSpecs = @(
         Description = "Container runtime named in the command the Docker Hub picker (dhs) prepares: 'docker' or 'podman'. Podman gets fully qualified image names (docker.io/library/nginx)."
     }
     [ordered]@{
+        Name        = 'PROFILE_UPDATE_CHECK'
+        Default     = '1'
+        Type        = 'bool'
+        Group       = 'General'
+        Description = 'Check in the background whether this profile (when run from a git clone) is behind main on GitHub, and show a clock icon in the prompt when it is. Runs at most once per PROFILE_UPDATE_CHECK_HOURS and never blocks the shell.'
+    }
+    [ordered]@{
+        Name        = 'PROFILE_UPDATE_CHECK_HOURS'
+        Default     = '12'
+        Type        = 'int'
+        Min         = 1
+        Max         = 720
+        Group       = 'General'
+        Description = 'Minimum hours between background update checks.'
+    }
+    [ordered]@{
         Name        = 'PROFILE_ICONS'
         Default     = 'nerd'
         Type        = 'choice'
