@@ -42,6 +42,7 @@ What the profile adds to the shell. Each one needs the tool in the second column
 | `wgs <query>` | winget, fzf | Search winget packages and install the one you pick |
 | `dhs <query>` | fzf | Search Docker Hub, pick an image and get its `docker run` (or `podman run`, see `PROFILE_CONTAINER_RUNTIME`) command printed, not run. `dhs --run <query>` runs the picked image instead |
 | `tellme <question>` | claude | Terse one-shot answer from Claude (see [tellme](#tellme)) |
+| `cld [profile] [args]` | claude | Start Claude Code with its config folder switched, for several subscriptions: `cld` uses `$HOME\.claude`, `cld work` uses `$HOME\.claude-work`. Other arguments go to claude (`cld work --resume`) |
 | `cpath <file>` | | Copy the full path of a file or folder to the clipboard |
 | `cfg` | | Interactive settings screen (see [Changing settings from the shell](#changing-settings-from-the-shell)) |
 | `banner` | | Show the startup banner (PowerShell logo and system info) |
@@ -161,7 +162,7 @@ Every tool is optional. A fragment that depends on one is skipped when it is not
 | --- | --- | --- |
 | [bat](https://github.com/sharkdp/bat) | A `cat` clone with syntax highlighting and git integration | `cat`, `type` |
 | [Catppuccin](https://catppuccin.com) | A pastel color theme | Mocha theme for bat, fzf, ripgrep and micro |
-| [Claude Code](https://claude.com/claude-code) | Anthropic's coding agent | `tellme` (see [tellme](#tellme)) |
+| [Claude Code](https://claude.com/claude-code) | Anthropic's coding agent | `tellme` (see [tellme](#tellme)), `cld` |
 | [delta](https://github.com/dandavison/delta) | A syntax-highlighting pager for git diffs | Git uses it for `git diff`, `show` and `log -p` when installed (see [Tool configs](#tool-configs)) |
 | [eza](https://github.com/eza-community/eza) | A modern replacement for `ls` with icons and git awareness | `dir` |
 | [fd](https://github.com/sharkdp/fd) | A fast, friendly `find` alternative | With fzf, plain `fzf` lists files through fd (hidden files included, `.git` and `.gitignore`d files left out) |

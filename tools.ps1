@@ -25,7 +25,7 @@ $global:ProfileToolSpecs = @(
     }
     [ordered]@{
         Name        = 'claude'
-        Description = 'Claude Code, Anthropic''s coding agent; tellme uses it for one-shot answers'
+        Description = 'Claude Code, Anthropic''s coding agent; tellme uses it for one-shot answers and cld starts it per profile'
         Url         = 'https://claude.com/claude-code'
         Winget      = 'Anthropic.ClaudeCode'
     }

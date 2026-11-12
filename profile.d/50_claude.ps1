@@ -77,4 +77,35 @@ It sets the owner to read, write and execute, and everyone else to read and exec
     finally { Pop-Location }
 }
 
+function Invoke-ClaudeProfile {
+    <#
+    .SYNOPSIS
+        Start Claude Code with the config folder of a named profile, for working with several subscriptions.
+    .DESCRIPTION
+        Sets CLAUDE_CONFIG_DIR for the one claude run and restores it afterwards. Without a name it
+        uses $HOME\.claude, the default; with one, $HOME\.claude-<name>. A first argument that does
+        not start with a dash is the profile name, and everything after it goes to claude:
+        cld work --resume. A profile folder that does not exist yet is created by claude on first
+        use, so you log in there once.
+    .NOTES
+        Requires: claude
+        Aliases: cld
+    #>
+    $name = $null
+    $rest = $args
+    if ($args.Count -gt 0 -and "$($args[0])" -notlike '-*') {
+        $name = "$($args[0])"
+        $rest = @($args | Select-Object -Skip 1)
+        if ($name -notmatch '^[A-Za-z0-9_][A-Za-z0-9_.-]*$') { Write-Warning "Not a valid profile name: $name"; return }
+    }
+    $dir = $name ? (Join-Path $HOME ".claude-$name") : (Join-Path $HOME '.claude')
+    if ($name -and -not (Test-Path -LiteralPath $dir)) { Write-Host "New profile '$name': $dir does not exist yet, claude will set it up." -ForegroundColor Yellow }
+
+    $previous = $env:CLAUDE_CONFIG_DIR
+    $env:CLAUDE_CONFIG_DIR = $dir
+    try { & $ProfileTools.claude @rest }
+    finally { $env:CLAUDE_CONFIG_DIR = $previous }
+}
+
 Set-Alias -Name tellme -Value Invoke-Tellme
+Set-Alias -Name cld -Value Invoke-ClaudeProfile
