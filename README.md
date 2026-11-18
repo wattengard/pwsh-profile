@@ -34,6 +34,7 @@ What the profile adds to the shell. Each one needs the tool in the second column
 | --- | --- | --- |
 | `dir` | eza | Compact long listing with icons |
 | `cat`, `type` | bat | Syntax-highlighted file view |
+| `clipcat` | bat | Copy a file's text to the clipboard, keeping the encoding |
 | `cd`, `cdi` | zoxide | `cd` jumps to the best match for a partial name; `cdi` picks from a list (needs fzf) |
 | `y` | yazi | File manager that changes to its last directory on quit |
 | `micro` | micro | Opens in its own terminal window when run inside Claude Code (where micro stops responding), and waits for it to close; plain micro everywhere else. Call `micro.exe` to skip the wrapper. `EDITOR` gets the same treatment through `bin\micro-edit.ps1`, which is what makes Ctrl+G in Claude Code work |
